@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
 
-package com.mycompany.buscaminas;
+package buscaminas;
 
 /**
  *
@@ -11,6 +11,6 @@ package com.mycompany.buscaminas;
 public class Buscaminas {
 
     public static void main(String[] args) {
-        System.out.println("prueba 1!");
+        System.out.println("prueba 2!");
     }
 }
