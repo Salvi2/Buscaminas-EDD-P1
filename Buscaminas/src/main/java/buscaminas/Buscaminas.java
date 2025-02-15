@@ -11,6 +11,6 @@ package buscaminas;
 public class Buscaminas {
 
     public static void main(String[] args) {
-        System.out.println("prueba 2!");
+        System.out.println("prueba 3!");
     }
 }
