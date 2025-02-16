@@ -1,10 +1,11 @@
 package buscaminas_edd_1;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
+import java.awt.*;
 
 public class Buscaminas extends JFrame {
     private Tablero tablero;
+    private JRadioButton rbBFS, rbDFS;
 
     public Buscaminas() {
         setTitle("Buscaminas");
@@ -29,6 +30,21 @@ public class Buscaminas extends JFrame {
             JOptionPane.showMessageDialog(null, "El número de minas no puede ser mayor que el número de casillas.");
             return;
         }
+        // Selector de algoritmo
+        JPanel panelBusqueda = new JPanel();
+        rbBFS = new JRadioButton("BFS", true);
+        rbDFS = new JRadioButton("DFS");
+        ButtonGroup grupo = new ButtonGroup();
+        grupo.add(rbBFS);
+        grupo.add(rbDFS);
+
+        rbBFS.addActionListener(e -> tablero.setUsarBFS(true));
+        rbDFS.addActionListener(e -> tablero.setUsarBFS(false));
+
+        panelBusqueda.add(rbBFS);
+        panelBusqueda.add(rbDFS);
+        add(panelBusqueda, BorderLayout.NORTH);
+
 
         // Crear el tablero
         tablero = new Tablero(filas, columnas, minas);

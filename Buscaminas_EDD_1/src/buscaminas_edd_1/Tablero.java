@@ -8,73 +8,126 @@ public class Tablero extends JPanel {
     private int columnas;
     private int numMinas;
     private Casilla[][] casillas;
-    private ListaEnlazada minasColocadas; // Lista enlazada para almacenar minas
+    private ListaEnlazada minasColocadas;
+    private boolean usarBFS = true;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
         this.columnas = columnas;
         this.numMinas = numMinas;
         this.casillas = new Casilla[filas][columnas];
-        this.minasColocadas = new ListaEnlazada(); // Inicializar la lista enlazada
-        setLayout(new GridLayout(filas, columnas)); // Usar GridLayout para el tablero
+        this.minasColocadas = new ListaEnlazada();
+        setLayout(new GridLayout(filas, columnas));
         crearTablero();
+        construirGrafo();
         colocarMinas();
-        contarMinasAdyacentes(); // Calcular minas adyacentes para cada casilla
+        contarMinasAdyacentes();
     }
 
-    // Crear el tablero y asignar identificadores
     private void crearTablero() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
-                // Asignar identificador (e.g., "A1", "B2")
                 String id = String.valueOf((char) ('A' + j)) + (i + 1);
                 casillas[i][j] = new Casilla(id);
-                add(casillas[i][j]); // Añadir la casilla al panel
+                add(casillas[i][j]);
             }
         }
     }
 
-    // Colocar minas aleatoriamente
+    private void construirGrafo() {
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                Casilla actual = casillas[i][j];
+                for (int x = i - 1; x <= i + 1; x++) {
+                    for (int y = j - 1; y <= j + 1; y++) {
+                        if (x >= 0 && x < filas && y >= 0 && y < columnas && !(x == i && y == j)) {
+                            actual.agregarVecino(casillas[x][y]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void colocarMinas() {
         int minasColocadas = 0;
-
         while (minasColocadas < numMinas) {
-            // Generar fila y columna aleatorias
             int fila = (int) (Math.random() * filas);
             int columna = (int) (Math.random() * columnas);
-
-            // Obtener la casilla en la posición generada
             Casilla casilla = casillas[fila][columna];
-
-            // Verificar si la casilla ya tiene una mina
             if (!this.minasColocadas.contiene(casilla)) {
                 casilla.setEsMina(true);
-                this.minasColocadas.agregar(casilla); // Añadir a la lista de minas
+                this.minasColocadas.agregar(casilla);
                 minasColocadas++;
             }
         }
     }
 
-    // Contar minas adyacentes para cada casilla
     private void contarMinasAdyacentes() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 Casilla casilla = casillas[i][j];
                 if (!casilla.esMina()) {
-                    int minasAdyacentes = 0;
-
-                    // Verificar las 8 casillas adyacentes
-                    for (int x = i - 1; x <= i + 1; x++) {
-                        for (int y = j - 1; y <= j + 1; y++) {
-                            if (x >= 0 && x < filas && y >= 0 && y < columnas && casillas[x][y].esMina()) {
-                                minasAdyacentes++;
-                            }
-                        }
+                    int contador = 0;
+                    Nodo vecino = casilla.getVecinos().getCabeza();
+                    while (vecino != null) {
+                        if (vecino.casilla.esMina()) contador++;
+                        vecino = vecino.siguiente;
                     }
-
-                    casilla.setMinasAdyacentes(minasAdyacentes); // Asignar el número de minas adyacentes
+                    casilla.setMinasAdyacentes(contador);
                 }
             }
         }
+    }
+
+    public void revelarDesde(Casilla inicio) {
+        if (usarBFS) bfs(inicio);
+        else dfs(inicio);
+    }
+
+    private void bfs(Casilla inicio) {
+        Cola cola = new Cola();
+        cola.encolar(inicio);
+        inicio.revelar();
+
+        while (!cola.estaVacia()) {
+            Casilla actual = cola.desencolar();
+            if (actual.getMinasAdyacentes() == 0) {
+                Nodo vecino = actual.getVecinos().getCabeza();
+                while (vecino != null) {
+                    Casilla v = vecino.casilla;
+                    if (!v.estaRevelada() && !v.esMina()) {
+                        v.revelar();
+                        cola.encolar(v);
+                    }
+                    vecino = vecino.siguiente;
+                }
+            }
+        }
+    }
+
+    private void dfs(Casilla inicio) {
+        Pila pila = new Pila();
+        pila.apilar(inicio);
+        inicio.revelar();
+
+        while (!pila.estaVacia()) {
+            Casilla actual = pila.desapilar();
+            if (actual.getMinasAdyacentes() == 0) {
+                Nodo vecino = actual.getVecinos().getCabeza();
+                while (vecino != null) {
+                    Casilla v = vecino.casilla;
+                    if (!v.estaRevelada() && !v.esMina()) {
+                        v.revelar();
+                        pila.apilar(v);
+                    }
+                    vecino = vecino.siguiente;
+                }
+            }
+        }
+    }
+
+    public void setUsarBFS(boolean usarBFS) {
+        this.usarBFS = usarBFS;
     }
 }

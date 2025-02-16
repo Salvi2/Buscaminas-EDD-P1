@@ -5,71 +5,87 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Casilla extends JButton {
-    private final String id; // Identificador único (e.g., "A1")
-    private boolean esMina; // True si tiene una mina
-    private int minasAdyacentes; // Número de minas adyacentes
+    private final String id;
+    private boolean esMina;
+    private int minasAdyacentes;
+    private boolean revelada;
+    private ListaEnlazada vecinos;
 
-    // Constructor
     public Casilla(String id) {
         this.id = id;
-        this.esMina = false; // Por defecto, no tiene una mina
-        this.minasAdyacentes = 0; // Por defecto, no tiene minas adyacentes
-        setText(id); // Mostrar el identificador en el botón
+        this.esMina = false;
+        this.minasAdyacentes = 0;
+        this.revelada = false;
+        this.vecinos = new ListaEnlazada();
+        setText(id);
 
-        // Agregar ActionListener para manejar clics
         addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                onClic(); // Llamar al método onClic cuando se hace clic
+                onClic();
             }
         });
     }
 
-    // Método para manejar clics
     public void onClic() {
         if (esMina) {
-            setText("💣"); // Mostrar una mina
-            setEnabled(false); // Deshabilitar la casilla
-
-            // Mostrar mensaje de derrota y opciones
+            setText("💣");
+            setEnabled(false);
             int opcion = JOptionPane.showOptionDialog(
-                null,
-                "¡Perdiste! Has activado una mina. ¿Qué deseas hacer?",
-                "Game Over",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                new Object[] { "Reiniciar", "Salir" }, // Opciones personalizadas
-                "Reiniciar" // Opción por defecto
+                null, 
+                "¡Perdiste! ¿Reiniciar?", 
+                "Game Over", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.QUESTION_MESSAGE, 
+                null, 
+                new Object[]{"Reiniciar", "Salir"}, 
+                "Reiniciar"
             );
-
-            // Manejar la opción seleccionada
             if (opcion == JOptionPane.YES_OPTION) {
-                reiniciarJuego(); // Reiniciar el juego
+                reiniciarJuego();
             } else {
-                System.exit(0); // Salir del programa
+                System.exit(0);
             }
         } else {
-            setText(String.valueOf(minasAdyacentes)); // Mostrar el número de minas adyacentes
-            setEnabled(false); // Deshabilitar la casilla
+            Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, this);
+            if (tablero != null) {
+                tablero.revelarDesde(this);
+            }
         }
     }
 
-    // Método para reiniciar el juego
     private void reiniciarJuego() {
         JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
-        ventana.dispose(); // Cerrar la ventana actual
-
-        // Crear una nueva ventana con un nuevo tablero
+        ventana.dispose();
         new Buscaminas();
     }
 
-    // Getter para el identificador
+    public void agregarVecino(Casilla vecino) {
+        vecinos.agregar(vecino);
+    }
+
+    public ListaEnlazada getVecinos() {
+        return vecinos;
+    }
+
+    public void revelar() {
+        if (esMina) {
+            setText("💣");
+        } else {
+            setText(minasAdyacentes > 0 ? String.valueOf(minasAdyacentes) : "");
+        }
+        setEnabled(false);
+        revelada = true;
+    }
+
+    public boolean estaRevelada() {
+        return revelada;
+    }
+
     public String getId() {
         return id;
     }
 
-    // Getter y setter para esMina
     public boolean esMina() {
         return esMina;
     }
@@ -78,7 +94,6 @@ public class Casilla extends JButton {
         this.esMina = esMina;
     }
 
-    // Getter y setter para minasAdyacentes
     public int getMinasAdyacentes() {
         return minasAdyacentes;
     }
