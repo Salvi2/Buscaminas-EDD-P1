@@ -1,5 +1,5 @@
 package buscaminas_edd_1;
-
+ 
 import javax.swing.*;
 import java.awt.*;
 
