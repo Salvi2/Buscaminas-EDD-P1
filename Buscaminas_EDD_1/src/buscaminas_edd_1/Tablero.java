@@ -10,11 +10,13 @@ public class Tablero extends JPanel {
     private Casilla[][] casillas;
     private ListaEnlazada minasColocadas;
     private boolean usarBFS = true;
+    private int banderasDisponibles;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
         this.columnas = columnas;
         this.numMinas = numMinas;
+            this.banderasDisponibles = numMinas; // Inicializar con el número de minas
         this.casillas = new Casilla[filas][columnas];
         this.minasColocadas = new ListaEnlazada();
         setLayout(new GridLayout(filas, columnas));
@@ -23,7 +25,13 @@ public class Tablero extends JPanel {
         colocarMinas();
         contarMinasAdyacentes();
     }
-
+    
+    public void actualizarBanderasDisponibles(int cambio) {
+    banderasDisponibles += cambio;
+    
+    System.out.println("Banderas disponibles: " + banderasDisponibles); // Para depuración
+    }
+    
     private void crearTablero() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -130,4 +138,47 @@ public class Tablero extends JPanel {
     public void setUsarBFS(boolean usarBFS) {
         this.usarBFS = usarBFS;
     }
+    
+    public boolean todasLasMinasMarcadas() {
+    Nodo actual = minasColocadas.getCabeza();
+    while (actual != null) {
+        if (!actual.casilla.estaMarcadaConBandera()) {
+            return false; // Si alguna mina no está marcada, retornar false
+        }
+        actual = actual.siguiente;
+    }
+    return true; // Todas las minas están marcadas
+    }
+    
+    public void verificarVictoria() {
+    boolean todasReveladas = true;
+    for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            Casilla casilla = casillas[i][j];
+            if (!casilla.esMina() && !casilla.estaRevelada()) {
+                todasReveladas = false;
+                break;
+            }
+        }
+    }
+
+    if (todasReveladas && todasLasMinasMarcadas()) {
+        JOptionPane.showMessageDialog(null, "¡Ganaste! Todas las minas fueron marcadas correctamente.");
+        
+    }
+    }
+    
+    public void marcarCasillaConBandera(Casilla casilla) {
+    if (!casilla.estaRevelada()) {
+        if (casilla.estaMarcadaConBandera()) {
+            // Si ya estaba marcada, la desmarcamos
+            casilla.marcarConBandera();
+            actualizarBanderasDisponibles(1); // Aumentar banderas disponibles
+        } else if (banderasDisponibles > 0) {
+            // Si no estaba marcada y hay banderas disponibles, la marcamos
+            casilla.marcarConBandera();
+            actualizarBanderasDisponibles(-1); // Reducir banderas disponibles
+        }
+    }
+}
 }

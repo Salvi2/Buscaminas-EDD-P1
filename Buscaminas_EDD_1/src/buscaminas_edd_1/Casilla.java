@@ -3,6 +3,8 @@ package buscaminas_edd_1;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Casilla extends JButton {
     private final String id;
@@ -10,22 +12,38 @@ public class Casilla extends JButton {
     private int minasAdyacentes;
     private boolean revelada;
     private ListaEnlazada vecinos;
+    private boolean marcadaConBandera;
 
     public Casilla(String id) {
-        this.id = id;
-        this.esMina = false;
-        this.minasAdyacentes = 0;
-        this.revelada = false;
-        this.vecinos = new ListaEnlazada();
-        setText(id);
+this.id = id;
+    this.esMina = false;
+    this.minasAdyacentes = 0;
+    this.revelada = false;
+    this.marcadaConBandera = false;
+    this.vecinos = new ListaEnlazada();
+    setText(id);
 
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onClic();
+    // Manejar clic izquierdo
+    addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            onClic();
+        }
+    });
+
+    // Manejar clic derecho
+    addMouseListener(new MouseAdapter() {
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) { // Verificar si es clic derecho
+            Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, Casilla.this);
+            if (tablero != null) {
+                tablero.marcarCasillaConBandera(Casilla.this); // Llamar al método del tablero
             }
-        });
+        }
     }
+    });
+}
 
     public void onClic() {
         if (esMina) {
@@ -52,6 +70,17 @@ public class Casilla extends JButton {
                 tablero.revelarDesde(this);
             }
         }
+    }
+    
+    public void marcarConBandera() {
+    if (!revelada) { // Solo se puede marcar si no está revelada
+        marcadaConBandera = !marcadaConBandera;
+        setText(marcadaConBandera ? "🚩" : id); // Usamos un emoji de bandera
+    }
+    }
+    
+    public boolean estaMarcadaConBandera() {
+    return marcadaConBandera;
     }
 
     private void reiniciarJuego() {

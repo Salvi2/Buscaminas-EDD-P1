@@ -44,6 +44,12 @@ public class Buscaminas extends JFrame {
         panelBusqueda.add(rbBFS);
         panelBusqueda.add(rbDFS);
         add(panelBusqueda, BorderLayout.NORTH);
+        
+        // Añadir el contador de banderas
+        JLabel lblBanderas = new JLabel("Banderas maximas: " + minas);
+        panelBusqueda.add(lblBanderas);
+
+    add(panelBusqueda, BorderLayout.NORTH);
 
 
         // Crear el tablero
@@ -54,10 +60,14 @@ public class Buscaminas extends JFrame {
 
         // Mostrar la ventana
         setVisible(true);
+        
     }
+    
+    
 
     public static void main(String[] args) {
         // Ejecutar la interfaz gráfica en el hilo de eventos de Swing
         SwingUtilities.invokeLater(() -> new Buscaminas());
     }
+    
 }
