@@ -1,6 +1,5 @@
 package buscaminas_edd_1;
 
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,6 +19,7 @@ public class Tablero extends JPanel {
         setLayout(new GridLayout(filas, columnas)); // Usar GridLayout para el tablero
         crearTablero();
         colocarMinas();
+        contarMinasAdyacentes(); // Calcular minas adyacentes para cada casilla
     }
 
     // Crear el tablero y asignar identificadores
@@ -51,6 +51,29 @@ public class Tablero extends JPanel {
                 casilla.setEsMina(true);
                 this.minasColocadas.agregar(casilla); // Añadir a la lista de minas
                 minasColocadas++;
+            }
+        }
+    }
+
+    // Contar minas adyacentes para cada casilla
+    private void contarMinasAdyacentes() {
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                Casilla casilla = casillas[i][j];
+                if (!casilla.esMina()) {
+                    int minasAdyacentes = 0;
+
+                    // Verificar las 8 casillas adyacentes
+                    for (int x = i - 1; x <= i + 1; x++) {
+                        for (int y = j - 1; y <= j + 1; y++) {
+                            if (x >= 0 && x < filas && y >= 0 && y < columnas && casillas[x][y].esMina()) {
+                                minasAdyacentes++;
+                            }
+                        }
+                    }
+
+                    casilla.setMinasAdyacentes(minasAdyacentes); // Asignar el número de minas adyacentes
+                }
             }
         }
     }
