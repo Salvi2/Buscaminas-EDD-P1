@@ -1,5 +1,5 @@
 package buscaminas_edd_1;
-
+import winnPanel.WIN;
 import javax.swing.*;
 import java.awt.*;
 
@@ -29,7 +29,7 @@ public class Tablero extends JPanel {
     public void actualizarBanderasDisponibles(int cambio) {
     banderasDisponibles += cambio;
     
-    System.out.println("Banderas disponibles: " + banderasDisponibles); // Para depuración
+    
     }
     
     private void crearTablero() {
@@ -87,10 +87,11 @@ public class Tablero extends JPanel {
             }
         }
     }
-
+    
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) bfs(inicio);
         else dfs(inicio);
+        verificarVictoria(); // Verificar si el jugador ha ganado
     }
 
     private void bfs(Casilla inicio) {
@@ -151,26 +152,47 @@ public class Tablero extends JPanel {
     return true; // Todas las minas están marcadas
     }
     
-    public void verificarVictoria() {
+public void verificarVictoria() {
+    // Verificar si todas las casillas no minas están reveladas
     boolean todasReveladas = true;
     for (int i = 0; i < filas; i++) {
         for (int j = 0; j < columnas; j++) {
             Casilla casilla = casillas[i][j];
             if (!casilla.esMina() && !casilla.estaRevelada()) {
                 todasReveladas = false;
-                break;
+                break; // Salir del bucle si encontramos una casilla no revelada
             }
+        }
+        if (!todasReveladas) {
+            break; // Salir del bucle exterior si ya sabemos que no todas están reveladas
         }
     }
 
-    if (todasReveladas && todasLasMinasMarcadas()) {
-        JOptionPane.showMessageDialog(null, "¡Ganaste! Todas las minas fueron marcadas correctamente.");
+    // Verificar si todas las minas están marcadas con banderas
+    boolean todasMinasMarcadas = todasLasMinasMarcadas();
+
+ 
+
+    // Si se cumplen ambas condiciones, abrir la ventana de victoria
+    if (todasReveladas && todasMinasMarcadas) {
+        WIN winPanel = new WIN();
+        winPanel.setVisible(true);
+        winPanel.setLocationRelativeTo(null);
+            // Deshabilitar todas las casillas
+        for (int i = 0; i < filas; i++) {
+        for (int j = 0; j < columnas; j++) {
+            casillas[i][j].setEnabled(false);
+        }
+        }
+        
+        JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+        ventanaPrincipal.dispose();
         
     }
-    }
-    
+}
+   
     public void marcarCasillaConBandera(Casilla casilla) {
-    if (!casilla.estaRevelada()) {
+        if (!casilla.estaRevelada()) {
         if (casilla.estaMarcadaConBandera()) {
             // Si ya estaba marcada, la desmarcamos
             casilla.marcarConBandera();
@@ -180,6 +202,7 @@ public class Tablero extends JPanel {
             casilla.marcarConBandera();
             actualizarBanderasDisponibles(-1); // Reducir banderas disponibles
         }
+        verificarVictoria(); // Verificar si el jugador ha ganado
     }
 }
 }
