@@ -46,29 +46,33 @@ this.id = id;
 }
 
     public void onClic() {
-        if (esMina) {
-            setText("💣");
-            setEnabled(false);
-            int opcion = JOptionPane.showOptionDialog(
-                null, 
-                "¡Perdiste! ¿Reiniciar?", 
-                "Game Over", 
-                JOptionPane.YES_NO_OPTION, 
-                JOptionPane.QUESTION_MESSAGE, 
-                null, 
-                new Object[]{"Reiniciar", "Salir"}, 
-                "Reiniciar"
-            );
-            if (opcion == JOptionPane.YES_OPTION) {
-                reiniciarJuego();
-            } else {
-                System.exit(0);
-            }
+        if (estaMarcadaConBandera()) {
+        return; // Si está marcada con bandera, no hacer nada
+    }
+
+    if (esMina) {
+        setText("💣");
+        setEnabled(false);
+        int opcion = JOptionPane.showOptionDialog(
+            null, 
+            "¡Perdiste! ¿Reiniciar?", 
+            "Game Over", 
+            JOptionPane.YES_NO_OPTION, 
+            JOptionPane.QUESTION_MESSAGE, 
+            null, 
+            new Object[]{"Reiniciar", "Salir"}, 
+            "Reiniciar"
+        );
+        if (opcion == JOptionPane.YES_OPTION) {
+            reiniciarJuego();
         } else {
-            Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, this);
-            if (tablero != null) {
-                tablero.revelarDesde(this);
-            }
+            System.exit(0);
+        }
+        } else {
+        Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, this);
+        if (tablero != null) {
+            tablero.revelarDesde(this);
+        }
         }
     }
     

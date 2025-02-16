@@ -94,41 +94,42 @@ public class Tablero extends JPanel {
     }
 
     private void bfs(Casilla inicio) {
-        Cola cola = new Cola();
-        cola.encolar(inicio);
-        inicio.revelar();
+    Cola cola = new Cola();
+    cola.encolar(inicio);
+    inicio.revelar();
 
-        while (!cola.estaVacia()) {
-            Casilla actual = cola.desencolar();
-            if (actual.getMinasAdyacentes() == 0) {
-                Nodo vecino = actual.getVecinos().getCabeza();
-                while (vecino != null) {
-                    Casilla v = vecino.casilla;
-                    if (!v.estaRevelada() && !v.esMina()) {
-                        v.revelar();
-                        cola.encolar(v);
-                    }
+    while (!cola.estaVacia()) {
+        Casilla actual = cola.desencolar();
+        if (actual.getMinasAdyacentes() == 0) {
+            Nodo vecino = actual.getVecinos().getCabeza();
+            while (vecino != null) {
+                Casilla v = vecino.casilla;
+                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                    v.revelar();
+                    cola.encolar(v);
+                }
                     vecino = vecino.siguiente;
                 }
             }
         }
     }
 
-    private void dfs(Casilla inicio) {
-        Pila pila = new Pila();
-        pila.apilar(inicio);
-        inicio.revelar();
 
-        while (!pila.estaVacia()) {
-            Casilla actual = pila.desapilar();
-            if (actual.getMinasAdyacentes() == 0) {
-                Nodo vecino = actual.getVecinos().getCabeza();
-                while (vecino != null) {
-                    Casilla v = vecino.casilla;
-                    if (!v.estaRevelada() && !v.esMina()) {
-                        v.revelar();
-                        pila.apilar(v);
-                    }
+    private void dfs(Casilla inicio) {
+    Pila pila = new Pila();
+    pila.apilar(inicio);
+    inicio.revelar();
+
+    while (!pila.estaVacia()) {
+        Casilla actual = pila.desapilar();
+        if (actual.getMinasAdyacentes() == 0) {
+            Nodo vecino = actual.getVecinos().getCabeza();
+            while (vecino != null) {
+                Casilla v = vecino.casilla;
+                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                    v.revelar();
+                    pila.apilar(v);
+                }
                     vecino = vecino.siguiente;
                 }
             }
