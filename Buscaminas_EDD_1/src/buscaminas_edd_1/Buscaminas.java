@@ -7,7 +7,7 @@ public class Buscaminas extends JFrame {
     private Tablero tablero;
     private JRadioButton rbBFS, rbDFS;
 
-    public Buscaminas() {
+    public Buscaminas() { 
         setTitle("Buscaminas");
         setSize(500, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
