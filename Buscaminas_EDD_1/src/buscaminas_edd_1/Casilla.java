@@ -1,5 +1,5 @@
 package buscaminas_edd_1;
-
+import losePanel.Lose;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,33 +46,23 @@ this.id = id;
 }
 
     public void onClic() {
-        if (estaMarcadaConBandera()) {
-        return; // Si está marcada con bandera, no hacer nada
-    }
+        if (esMina) {
+            setText("💣");
+            setEnabled(false);
 
-    if (esMina) {
-        setText("💣");
-        setEnabled(false);
-        int opcion = JOptionPane.showOptionDialog(
-            null, 
-            "¡Perdiste! ¿Reiniciar?", 
-            "Game Over", 
-            JOptionPane.YES_NO_OPTION, 
-            JOptionPane.QUESTION_MESSAGE, 
-            null, 
-            new Object[]{"Reiniciar", "Salir"}, 
-            "Reiniciar"
-        );
-        if (opcion == JOptionPane.YES_OPTION) {
-            reiniciarJuego();
+            // Crear una instancia de la clase Lose y mostrarla
+            Lose loseFrame = new Lose();
+            loseFrame.setVisible(true);
+            loseFrame.setLocationRelativeTo(null);
+
+            // Opcional: Cerrar la ventana actual del juego si es necesario
+            JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+            ventana.dispose();
         } else {
-            System.exit(0);
-        }
-        } else {
-        Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, this);
-        if (tablero != null) {
-            tablero.revelarDesde(this);
-        }
+            Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, this);
+            if (tablero != null) {
+                tablero.revelarDesde(this);
+            }
         }
     }
     
