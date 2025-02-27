@@ -5,8 +5,7 @@
 package losePanel;
 
 import buscaminas_edd_1.Buscaminas;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+
 
 /**
  *
@@ -82,7 +81,11 @@ public class Lose extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
-               // TODO add your handling code here:
+    // Cerrar la ventana actual
+        this.dispose();
+
+    // Llamar a la clase Buscaminas para reiniciar el programa
+        Buscaminas.main(new String[]{});
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

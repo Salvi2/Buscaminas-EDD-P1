@@ -4,6 +4,8 @@
  */
 package winnPanel;
 
+import buscaminas_edd_1.Buscaminas;
+
 /**
  *
  * @author jesus
@@ -65,7 +67,11 @@ public class WIN extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+            // Cerrar la ventana actual
+        this.dispose();
+
+    // Llamar a la clase Buscaminas para reiniciar el programa
+        Buscaminas.main(new String[]{});        // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

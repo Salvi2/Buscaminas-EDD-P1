@@ -163,6 +163,8 @@ public class Inicio extends javax.swing.JFrame {
             frame.pack();
             frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
             frame.setVisible(true);
+            
+             this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void NumeroColumnasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroColumnasActionPerformed
