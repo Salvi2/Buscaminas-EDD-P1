@@ -46,6 +46,10 @@ this.id = id;
 }
 
     public void onClic() {
+            // Si la casilla está marcada con una bandera, no se permite hacer clic izquierdo
+            if (marcadaConBandera){
+                return; // Salir del método sin hacer nada
+            }
         if (esMina) {
             setText("💣");
             setEnabled(false);
