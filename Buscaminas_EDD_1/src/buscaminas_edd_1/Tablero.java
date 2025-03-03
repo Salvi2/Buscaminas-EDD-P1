@@ -5,6 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
+import org.graphstream.graph.*;
+import org.graphstream.graph.implementations.*;
+import org.graphstream.ui.view.Viewer;
 
 public class Tablero extends JPanel {
     private int filas;
@@ -15,10 +18,15 @@ public class Tablero extends JPanel {
     private boolean usarBFS = true; // Por defecto, se usa BFS
     private int banderasDisponibles;
 
+    // Grafo para GraphStream
+    private Graph grafoGraphStream;
+    private Viewer viewer; // Visor del grafo
+
     // Botones para BFS, DFS y Guardar Partida
     private JButton botonBFS;
     private JButton botonDFS;
     private JButton botonGuardar;
+    private JButton botonMostrarGrafo;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
@@ -31,9 +39,18 @@ public class Tablero extends JPanel {
         // Configurar el layout principal
         setLayout(new BorderLayout());
 
+        // Inicializar GraphStream
+        System.setProperty("org.graphstream.ui", "swing"); // Usar Swing para la interfaz
+        grafoGraphStream = new SingleGraph("Buscaminas");
+        grafoGraphStream.setAttribute("ui.stylesheet", "node { fill-color: blue; size: 20px; text-size: 15px; }");
+
         // Panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new FlowLayout());
+        
+        botonMostrarGrafo = new JButton("Mostrar Gráfico");
+        botonMostrarGrafo.addActionListener(e -> mostrarGrafo());
+        panelBotones.add(botonMostrarGrafo); // Agregar el botón al panel de botones
 
         // Botón para activar BFS
         botonBFS = new JButton("Usar BFS");
@@ -68,6 +85,34 @@ public class Tablero extends JPanel {
         construirGrafo();
         colocarMinas();
         contarMinasAdyacentes();
+    }
+
+    // Método para mostrar el grafo en una ventana aparte
+    public void mostrarGrafo() {
+        if (viewer == null) {
+            viewer = grafoGraphStream.display(); // Mostrar el grafo por primera vez
+        } else {
+            // Cerrar el visor actual y abrir uno nuevo para actualizar el grafo
+            viewer.getDefaultView().close(viewer.getGraphicGraph());
+            viewer = grafoGraphStream.display();
+        }
+    }
+
+    // Método para agregar un nodo al grafo de GraphStream
+    private void agregarNodoGraphStream(Casilla casilla) {
+        String id = casilla.getId();
+        if (grafoGraphStream.getNode(id) == null) {
+            Node nodo = grafoGraphStream.addNode(id);
+            nodo.setAttribute("ui.label", id);
+        }
+    }
+
+    // Método para agregar una arista al grafo de GraphStream
+    private void agregarAristaGraphStream(Casilla origen, Casilla destino) {
+        String idArista = origen.getId() + "-" + destino.getId();
+        if (grafoGraphStream.getEdge(idArista) == null) {
+            grafoGraphStream.addEdge(idArista, origen.getId(), destino.getId());
+        }
     }
 
     private void crearTablero(JPanel panelTablero) {
@@ -127,81 +172,92 @@ public class Tablero extends JPanel {
     }
 
     private void guardarPartida() {
-    // Obtener la ruta del escritorio del usuario
-    String rutaEscritorio = System.getProperty("user.home") + "/Desktop/partida_guardada.csv";
+        // Obtener la ruta del escritorio del usuario
+        String rutaEscritorio = System.getProperty("user.home") + "/Desktop/partida_guardada.csv";
 
-    try (FileWriter writer = new FileWriter(rutaEscritorio)) {
-        // Escribir el encabezado del CSV
-        writer.write("ID,Mina,Revelada,Bandera,Minas Adyacentes\n");
+        try (FileWriter writer = new FileWriter(rutaEscritorio)) {
+            // Escribir el encabezado del CSV
+            writer.write("ID,Mina,Revelada,Bandera,Minas Adyacentes\n");
 
-        // Guardar el estado de cada casilla en formato CSV
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                Casilla casilla = casillas[i][j];
-                writer.write(
-                    casilla.getId() + "," +
-                    casilla.esMina() + "," +
-                    casilla.estaRevelada() + "," +
-                    casilla.estaMarcadaConBandera() + "," +
-                    casilla.getMinasAdyacentes() + "\n"
-                );
+            // Guardar el estado de cada casilla en formato CSV
+            for (int i = 0; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    Casilla casilla = casillas[i][j];
+                    writer.write(
+                        casilla.getId() + "," +
+                        casilla.esMina() + "," +
+                        casilla.estaRevelada() + "," +
+                        casilla.estaMarcadaConBandera() + "," +
+                        casilla.getMinasAdyacentes() + "\n"
+                    );
+                }
             }
-        }
 
-        JOptionPane.showMessageDialog(this, "Partida guardada correctamente en el Escritorio.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Partida guardada correctamente en el Escritorio.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
-}
 
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) bfs(inicio);
         else dfs(inicio);
+        repaint(); // Forzar la actualización del tablero
         verificarVictoria(); // Verificar si el jugador ha ganado
     }
 
     private void bfs(Casilla inicio) {
-        Cola cola = new Cola();
-        cola.encolar(inicio);
-        inicio.revelar();
+    Cola cola = new Cola();
+    cola.encolar(inicio);
+    inicio.revelar();
+    agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
 
-        while (!cola.estaVacia()) {
-            Casilla actual = cola.desencolar();
-            if (actual.getMinasAdyacentes() == 0) {
-                Nodo vecino = actual.getVecinos().getCabeza();
-                while (vecino != null) {
-                    Casilla v = vecino.casilla;
-                    if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
-                        v.revelar();
-                        cola.encolar(v);
-                    }
-                    vecino = vecino.siguiente;
+    while (!cola.estaVacia()) {
+        Casilla actual = cola.desencolar();
+        if (actual.getMinasAdyacentes() == 0) {
+            // Solo revelar casillas adyacentes si la casilla actual está vacía
+            Nodo vecino = actual.getVecinos().getCabeza();
+            while (vecino != null) {
+                Casilla v = vecino.casilla;
+                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                    v.revelar();
+                    cola.encolar(v);
+                    agregarNodoGraphStream(v); // Agregar el nodo al grafo
+                    agregarAristaGraphStream(actual, v); // Agregar la arista
                 }
+                vecino = vecino.siguiente;
             }
         }
     }
+    // nada
+}   
 
     private void dfs(Casilla inicio) {
-        Pila pila = new Pila();
-        pila.apilar(inicio);
-        inicio.revelar();
+    Pila pila = new Pila();
+    pila.apilar(inicio);
+    inicio.revelar();
+    agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
 
-        while (!pila.estaVacia()) {
-            Casilla actual = pila.desapilar();
-            if (actual.getMinasAdyacentes() == 0) {
-                Nodo vecino = actual.getVecinos().getCabeza();
-                while (vecino != null) {
-                    Casilla v = vecino.casilla;
-                    if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
-                        v.revelar();
-                        pila.apilar(v);
-                    }
-                    vecino = vecino.siguiente;
+    while (!pila.estaVacia()) {
+        Casilla actual = pila.desapilar();
+        if (actual.getMinasAdyacentes() == 0) {
+            // Solo revelar casillas adyacentes si la casilla actual está vacía
+            Nodo vecino = actual.getVecinos().getCabeza();
+            while (vecino != null) {
+                Casilla v = vecino.casilla;
+                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                    v.revelar();
+                    pila.apilar(v);
+                    agregarNodoGraphStream(v); // Agregar el nodo al grafo
+                    agregarAristaGraphStream(actual, v); // Agregar la arista
                 }
+                vecino = vecino.siguiente;
             }
         }
     }
+    // NO Mostrar el grafo al finalizar DFS
+}
 
     public void setUsarBFS(boolean usarBFS) {
         this.usarBFS = usarBFS;
