@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.File;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
@@ -172,31 +173,51 @@ public class Tablero extends JPanel {
     }
 
     private void guardarPartida() {
-        // Obtener la ruta del escritorio del usuario
-        String rutaEscritorio = System.getProperty("user.home") + "/Desktop/partida_guardada.csv";
+        // Crear un JFileChooser para que el usuario elija la ubicación y el nombre del archivo
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Guardar partida"); // Título del diálogo
+        fileChooser.setSelectedFile(new File("partida_guardada.csv")); // Nombre por defecto del archivo
 
-        try (FileWriter writer = new FileWriter(rutaEscritorio)) {
-            // Escribir el encabezado del CSV
-            writer.write("ID,Mina,Revelada,Bandera,Minas Adyacentes\n");
+        // Mostrar el diálogo de guardado
+        int seleccionUsuario = fileChooser.showSaveDialog(this);
 
-            // Guardar el estado de cada casilla en formato CSV
-            for (int i = 0; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    Casilla casilla = casillas[i][j];
-                    writer.write(
-                        casilla.getId() + "," +
-                        casilla.esMina() + "," +
-                        casilla.estaRevelada() + "," +
-                        casilla.estaMarcadaConBandera() + "," +
-                        casilla.getMinasAdyacentes() + "\n"
-                    );
-                }
+        // Verificar si el usuario hizo clic en "Guardar"
+        if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
+            // Obtener el archivo seleccionado por el usuario
+            File archivo = fileChooser.getSelectedFile();
+
+            // Asegurarse de que el archivo tenga la extensión .csv
+            if (!archivo.getName().toLowerCase().endsWith(".csv")) {
+                archivo = new File(archivo.getAbsolutePath() + ".csv");
             }
 
-            JOptionPane.showMessageDialog(this, "Partida guardada correctamente en el Escritorio.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+            // Guardar el archivo en la ubicación seleccionada
+            try (FileWriter writer = new FileWriter(archivo)) {
+                // Escribir el encabezado del CSV
+                writer.write("ID,Mina,Revelada,Bandera,Minas Adyacentes\n");
+
+                // Guardar el estado de cada casilla en formato CSV
+                for (int i = 0; i < filas; i++) {
+                    for (int j = 0; j < columnas; j++) {
+                        Casilla casilla = casillas[i][j];
+                        writer.write(
+                            casilla.getId() + "," +
+                            casilla.esMina() + "," +
+                            casilla.estaRevelada() + "," +
+                            casilla.estaMarcadaConBandera() + "," +
+                            casilla.getMinasAdyacentes() + "\n"
+                        );
+                    }
+                }
+
+                JOptionPane.showMessageDialog(this, "Partida guardada correctamente en:\n" + archivo.getAbsolutePath(), "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        } else {
+            // El usuario canceló el diálogo de guardado
+            JOptionPane.showMessageDialog(this, "Guardado cancelado.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
