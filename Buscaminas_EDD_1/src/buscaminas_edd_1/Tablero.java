@@ -3,6 +3,8 @@ package buscaminas_edd_1;
 import winnPanel.WIN;
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Tablero extends JPanel {
     private int filas;
@@ -13,9 +15,10 @@ public class Tablero extends JPanel {
     private boolean usarBFS = true; // Por defecto, se usa BFS
     private int banderasDisponibles;
 
-    // Botones para BFS y DFS
+    // Botones para BFS, DFS y Guardar Partida
     private JButton botonBFS;
     private JButton botonDFS;
+    private JButton botonGuardar;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
@@ -47,6 +50,11 @@ public class Tablero extends JPanel {
             JOptionPane.showMessageDialog(this, "Modo DFS activado.");
         });
         panelBotones.add(botonDFS);
+
+        // Botón para guardar partida
+        botonGuardar = new JButton("Guardar Partida");
+        botonGuardar.addActionListener(e -> guardarPartida());
+        panelBotones.add(botonGuardar);
 
         // Agregar el panel de botones en la parte superior
         add(panelBotones, BorderLayout.NORTH);
@@ -117,6 +125,35 @@ public class Tablero extends JPanel {
             }
         }
     }
+
+    private void guardarPartida() {
+    // Obtener la ruta del escritorio del usuario
+    String rutaEscritorio = System.getProperty("user.home") + "/Desktop/partida_guardada.csv";
+
+    try (FileWriter writer = new FileWriter(rutaEscritorio)) {
+        // Escribir el encabezado del CSV
+        writer.write("ID,Mina,Revelada,Bandera,Minas Adyacentes\n");
+
+        // Guardar el estado de cada casilla en formato CSV
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                Casilla casilla = casillas[i][j];
+                writer.write(
+                    casilla.getId() + "," +
+                    casilla.esMina() + "," +
+                    casilla.estaRevelada() + "," +
+                    casilla.estaMarcadaConBandera() + "," +
+                    casilla.getMinasAdyacentes() + "\n"
+                );
+            }
+        }
+
+        JOptionPane.showMessageDialog(this, "Partida guardada correctamente en el Escritorio.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(this, "Error al guardar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+    }
+}
 
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) bfs(inicio);
