@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
+import java.util.Scanner;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
@@ -13,21 +14,21 @@ import org.graphstream.ui.view.Viewer;
 public class Tablero extends JPanel {
     private int filas;
     private int columnas;
-    private int numMinas;
+    private final int numMinas;
     private Casilla[][] casillas;
-    private ListaEnlazada minasColocadas;
+    private final ListaEnlazada minasColocadas;
     private boolean usarBFS = true; // Por defecto, se usa BFS
     private int banderasDisponibles;
 
     // Grafo para GraphStream
-    private Graph grafoGraphStream;
+    private final Graph grafoGraphStream;
     private Viewer viewer; // Visor del grafo
 
     // Botones para BFS, DFS y Guardar Partida
-    private JButton botonBFS;
-    private JButton botonDFS;
-    private JButton botonGuardar;
-    private JButton botonMostrarGrafo;
+    private final JButton botonBFS;
+    private final JButton botonDFS;
+    private final JButton botonGuardar;
+    private final JButton botonMostrarGrafo;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
@@ -220,6 +221,76 @@ public class Tablero extends JPanel {
             JOptionPane.showMessageDialog(this, "Guardado cancelado.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
     }
+    // Método para cargar la partida desde un archivo CSV
+    private void cargarPartida() {
+    // Crear JFileChooser para seleccionar el archivo
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Cargar partida");
+
+    // Mostrar el diálogo de selección de archivo
+    int seleccionUsuario = fileChooser.showOpenDialog(this);
+
+    // Verificar si el usuario seleccionó un archivo
+    if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
+        File archivo = fileChooser.getSelectedFile();
+        int totalCasillas = 0;
+
+        // Primer bloque try: Contar las líneas para calcular filas y columnas
+        try (Scanner scanner = new Scanner(archivo)) {
+            // Omitir la primera línea (encabezado)
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+
+            // Contar cuántas casillas hay en el archivo
+            while (scanner.hasNextLine()) {
+                scanner.nextLine();
+                totalCasillas++;
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+            return;
+        }
+
+        // Calcular dimensiones del tablero (suponiendo que es rectangular o cuadrado)
+        this.filas = (int) Math.sqrt(totalCasillas);
+        this.columnas = totalCasillas / filas;
+
+        // Inicializar la matriz de casillas
+        casillas = new Casilla[filas][columnas];
+
+        // Segundo bloque try: Leer y cargar los datos del archivo
+        try (Scanner scanner = new Scanner(archivo)) {
+            scanner.nextLine(); // Omitir la primera línea (encabezado)
+
+            while (scanner.hasNextLine()) {
+                String[] valores = scanner.nextLine().split(",");
+
+                int id = Integer.parseInt(valores[0]);
+                boolean esMina = Boolean.parseBoolean(valores[1]);
+                boolean revelada = Boolean.parseBoolean(valores[2]);
+                boolean bandera = Boolean.parseBoolean(valores[3]);
+                int minasAdyacentes = Integer.parseInt(valores[4]);
+
+                // Calcular la posición en la matriz
+                int i = id / columnas;
+                int j = id % columnas;
+
+                // Crear objeto Casilla y guardarlo en la matriz
+                casillas[i][j] = new Casilla(id, esMina, revelada, bandera, minasAdyacentes);
+            }
+
+            JOptionPane.showMessageDialog(this, "Partida cargada correctamente desde:\n" + archivo.getAbsolutePath(), "Cargar Partida", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException | NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Error al cargar la partida: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    } else {
+        // El usuario canceló la selección del archivo
+        JOptionPane.showMessageDialog(this, "Carga cancelada.", "Cargar Partida", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
 
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) bfs(inicio);
@@ -349,5 +420,21 @@ public class Tablero extends JPanel {
 
     public void actualizarBanderasDisponibles(int cambio) {
         banderasDisponibles += cambio;
+    }
+
+    public void setMina(int fila, int columna, boolean mina) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setRevelada(int fila, int columna, boolean revelada) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setBandera(int fila, int columna, boolean bandera) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setMinasAdyacentes(int fila, int columna, int minasAdyacentes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

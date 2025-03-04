@@ -45,6 +45,10 @@ this.id = id;
     });
 }
 
+    Casilla(int id, boolean esMina, boolean revelada, boolean bandera, int minasAdyacentes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public void onClic() {
             // Si la casilla está marcada con una bandera, no se permite hacer clic izquierdo
             if (marcadaConBandera){
@@ -127,5 +131,13 @@ this.id = id;
 
     public void setMinasAdyacentes(int minasAdyacentes) {
         this.minasAdyacentes = minasAdyacentes;
+    }
+
+    public void setRevelada(boolean revelada) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public void setMarcadaConBandera(boolean bandera) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
