@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import winnPanel.WIN;
 
 /**
  *
@@ -164,13 +165,22 @@ public class Inicio extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Obtener los valores ingresados por el usuario
+            
+
+            // Verificar si los campos están vacíos
+            if (NumeroFilas.getText().trim().isEmpty() || 
+                NumeroColumnas.getText().trim().isEmpty() || 
+                NumeroMinas.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, ingresa valores en todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Detener la ejecución si algún campo está vacío
+            }
+              // Obtener los valores ingresados por el usuario
             int filas = Integer.parseInt(NumeroFilas.getText());
             int columnas = Integer.parseInt(NumeroColumnas.getText());
             int minas = Integer.parseInt(NumeroMinas.getText());
 
             // Validar que los valores sean válidos
-            if (filas < 3 || filas > 10 || columnas < 3 || columnas > 10 || minas >= filas*columnas ) {
+            if ( filas < 3 || filas > 10 || columnas < 3 || columnas > 10 || minas >= filas*columnas) {
                 JOptionPane.showMessageDialog(this, "Valores inválidos. Asegúrate de que las filas, columnas y minas sean válidas.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
@@ -182,7 +192,7 @@ public class Inicio extends javax.swing.JFrame {
             // Crear el tablero con los valores ingresados
             Tablero tablero = new Tablero(filas, columnas, minas);
             frame.add(tablero);
-   // Ajustar el tamaño de la ventana y hacerla visible
+            // Ajustar el tamaño de la ventana y hacerla visible
             frame.pack();
             frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
             frame.setVisible(true);
@@ -234,7 +244,7 @@ public class Inicio extends javax.swing.JFrame {
                 boolean bandera = Boolean.parseBoolean(valores[3]); // Bandera
                 int minasAdyacentes = Integer.parseInt(valores[4]); // Minas adyacentes
 
-                // Convertir el ID de la casilla a coordenadas (fila, columna)
+                // Convertir el ID de la casilla a coordenadas (fila, colu  mna)
                 int fila = id.charAt(0) - 'A'; // Convertir la letra a índice (A=0, B=1, etc.)
                 int columna = Integer.parseInt(id.substring(1)) - 1; // Convertir el número a índice base 0
 
@@ -276,21 +286,21 @@ public class Inicio extends javax.swing.JFrame {
     }
 }
 
-// Método para iniciar el juego con el estado cargado
-private void iniciarJuego() {
-    // Habilitar todas las casillas
-    for (int i = 0; i < filas; i++) {
-        for (int j = 0; j < columnas; j++) {
-            Casilla casilla = casillas[i][j];
-            casilla.setEnabled(true); // Habilitar la casilla para interacción
-            if (casilla.estaRevelada()) {
+        // Método para iniciar el juego con el estado cargado
+        private void iniciarJuego() {
+         // Habilitar todas las casillas
+         for (int i = 0; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                Casilla casilla = casillas[i][j];
+                casilla.setEnabled(true); // Habilitar la casilla para interacción
+                if (casilla.estaRevelada()) {
                 casilla.revelar(); // Revelar la casilla si está marcada como revelada
-            }
-            if (casilla.estaMarcadaConBandera()) {
+                }
+                if (casilla.estaMarcadaConBandera()) {
                 casilla.marcarConBandera(); // Marcar con bandera si está marcada
-            }
+                }
+         }
         }
-    }
 
     // Actualizar la interfaz gráfica
     repaint(); // Forzar la actualización del tablero
@@ -317,7 +327,19 @@ private void verificarEstadoDelJuego() {
     }
 
     if (todasLasMinasMarcadas && todasLasCasillasReveladas) {
-        JOptionPane.showMessageDialog(this, "¡Felicidades! Has ganado la partida.", "Victoria", JOptionPane.INFORMATION_MESSAGE);
+            WIN winPanel = new WIN();
+            winPanel.setVisible(true);
+            winPanel.setLocationRelativeTo(null);
+
+            // Deshabilitar todas las casillas
+            for (int i = 0; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    casillas[i][j].setEnabled(false);
+                }
+            }
+
+            JFrame ventanaPrincipal = (JFrame) SwingUtilities.getWindowAncestor(this);
+            ventanaPrincipal.dispose();
     } else {
         // Si no se ha ganado, el juego continúa
         JOptionPane.showMessageDialog(this, "Partida cargada. ¡Continúa jugando!", "Partida Cargada", JOptionPane.INFORMATION_MESSAGE);
