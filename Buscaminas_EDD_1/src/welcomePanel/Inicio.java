@@ -177,7 +177,7 @@ public class Inicio extends javax.swing.JFrame {
               // Obtener los valores ingresados por el usuario
             int filas = Integer.parseInt(NumeroFilas.getText());
             int columnas = Integer.parseInt(NumeroColumnas.getText());
-            int minas = Integer.parseInt(NumeroMinas.getText());
+            int minas = Integer.parseInt(NumeroMinas.getText()); 
 
             // Validar que los valores sean válidos
             if ( filas < 3 || filas > 10 || columnas < 3 || columnas > 10 || minas >= filas*columnas) {
