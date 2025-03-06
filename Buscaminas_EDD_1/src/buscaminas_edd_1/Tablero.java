@@ -6,7 +6,6 @@ import java.awt.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
-import java.util.Scanner;
 import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
@@ -14,21 +13,21 @@ import org.graphstream.ui.view.Viewer;
 public class Tablero extends JPanel {
     private int filas;
     private int columnas;
-    private final int numMinas;
+    private int numMinas;
     private Casilla[][] casillas;
-    private final ListaEnlazada minasColocadas;
+    private ListaEnlazada minasColocadas;
     private boolean usarBFS = true; // Por defecto, se usa BFS
     private int banderasDisponibles;
 
     // Grafo para GraphStream
-    private final Graph grafoGraphStream;
+    private Graph grafoGraphStream;
     private Viewer viewer; // Visor del grafo
 
     // Botones para BFS, DFS y Guardar Partida
-    private final JButton botonBFS;
-    private final JButton botonDFS;
-    private final JButton botonGuardar;
-    private final JButton botonMostrarGrafo;
+    private JButton botonBFS;
+    private JButton botonDFS;
+    private JButton botonGuardar;
+    private JButton botonMostrarGrafo;
 
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
@@ -222,7 +221,6 @@ public class Tablero extends JPanel {
         }
     }
 
-
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) bfs(inicio);
         else dfs(inicio);
@@ -351,21 +349,5 @@ public class Tablero extends JPanel {
 
     public void actualizarBanderasDisponibles(int cambio) {
         banderasDisponibles += cambio;
-    }
-
-    public void setMina(int fila, int columna, boolean mina) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setRevelada(int fila, int columna, boolean revelada) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setBandera(int fila, int columna, boolean bandera) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setMinasAdyacentes(int fila, int columna, int minasAdyacentes) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
