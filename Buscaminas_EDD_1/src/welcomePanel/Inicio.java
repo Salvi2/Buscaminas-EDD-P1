@@ -214,7 +214,102 @@ public class Inicio extends javax.swing.JFrame {
 
     private void cargarPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarPartidaActionPerformed
         // TODO add your handling code
-   
+    // Crear un JFileChooser para que el usuario seleccione el archivo CSV
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Cargar partida guardada");
+    int seleccionUsuario = fileChooser.showOpenDialog(this);
+
+    // Verificar si el usuario seleccionó un archivo
+    if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
+        File archivo = fileChooser.getSelectedFile();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            List<String[]> datos = new ArrayList<>();
+
+            // Leer el archivo CSV línea por línea
+            br.readLine(); // Saltar la primera línea (encabezado)
+            while ((linea = br.readLine()) != null) {
+                String[] valores = linea.split(",");
+                if (valores.length == 5) { // Asegurarse de que la línea tenga 5 columnas
+                    datos.add(valores);
+                }
+            }
+
+            // Determinar el número de filas y columnas basado en los datos
+            int totalCasillas = datos.size();
+            int columnas = 10; // Asumimos que el tablero tiene 10 columnas
+            int filas = totalCasillas / columnas;
+
+            // Verificar que el número de casillas sea coherente
+            if (totalCasillas % columnas != 0) {
+                JOptionPane.showMessageDialog(this, "El archivo CSV no tiene un tamaño válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Crear una matriz de casillas con el tamaño adecuado
+            Casilla[][] casillas = new Casilla[filas][columnas];
+
+            // Contar el número de minas en el archivo
+            int numMinas = 0;
+
+            // Llenar la matriz de casillas con los datos del archivo
+            for (int i = 0; i < filas; i++) {
+                for (int j = 0; j < columnas; j++) {
+                    String[] valores = datos.get(i * columnas + j);
+                    String id = valores[0];
+                    boolean esMina = Boolean.parseBoolean(valores[1]);
+                    boolean revelada = Boolean.parseBoolean(valores[2]);
+                    boolean bandera = Boolean.parseBoolean(valores[3]);
+                    int minasAdyacentes = Integer.parseInt(valores[4]);
+
+                    // Crear la casilla con los datos leídos
+                    Casilla casilla = new Casilla(id);
+                    casilla.setEsMina(esMina);
+                    casilla.setRevelada(revelada);
+                    casilla.setMarcadaConBandera(bandera);
+                    casilla.setMinasAdyacentes(minasAdyacentes);
+
+                    casillas[i][j] = casilla;
+
+                    // Contar minas
+                    if (esMina) {
+                        numMinas++;
+                    }
+                }
+            }
+
+            // Crear una nueva ventana para el tablero
+            JFrame frame = new JFrame("Buscaminas - Partida Cargada");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            // Crear el tablero sin generar minas ni casillas nuevas
+            Tablero tablero = new Tablero(filas, columnas, numMinas, false);
+            tablero.setCasillas(casillas); // Asignar las casillas cargadas al tablero
+            frame.add(tablero);
+
+            // Ajustar el tamaño de la ventana y hacerla visible
+            frame.pack();
+            frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+            frame.setVisible(true);
+
+            // Cerrar la ventana de inicio
+            this.dispose();
+
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Error en el formato del archivo CSV: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Carga de partida cancelada.", "Información", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     }//GEN-LAST:event_cargarPartidaActionPerformed
 
     /**

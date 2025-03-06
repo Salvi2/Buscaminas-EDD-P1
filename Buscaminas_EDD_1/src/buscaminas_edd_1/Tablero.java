@@ -29,7 +29,13 @@ public class Tablero extends JPanel {
     private JButton botonGuardar;
     private JButton botonMostrarGrafo;
 
+    // Constructor para crear un tablero nuevo
     public Tablero(int filas, int columnas, int numMinas) {
+        this(filas, columnas, numMinas, true); // Llama al constructor principal con generarTablero = true
+    }
+
+    // Constructor principal
+    public Tablero(int filas, int columnas, int numMinas, boolean generarTablero) {
         this.filas = filas;
         this.columnas = columnas;
         this.numMinas = numMinas;
@@ -48,7 +54,7 @@ public class Tablero extends JPanel {
         // Panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new FlowLayout());
-        
+
         botonMostrarGrafo = new JButton("Mostrar Gráfico");
         botonMostrarGrafo.addActionListener(e -> mostrarGrafo());
         panelBotones.add(botonMostrarGrafo); // Agregar el botón al panel de botones
@@ -83,37 +89,42 @@ public class Tablero extends JPanel {
         crearTablero(panelTablero);
         add(panelTablero, BorderLayout.CENTER);
 
-        construirGrafo();
-        colocarMinas();
-        contarMinasAdyacentes();
-    }
-
-    // Método para mostrar el grafo en una ventana aparte
-    public void mostrarGrafo() {
-        if (viewer == null) {
-            viewer = grafoGraphStream.display(); // Mostrar el grafo por primera vez
-        } else {
-            // Cerrar el visor actual y abrir uno nuevo para actualizar el grafo
-            viewer.getDefaultView().close(viewer.getGraphicGraph());
-            viewer = grafoGraphStream.display();
+        if (generarTablero) {
+            construirGrafo();
+            colocarMinas();
+            contarMinasAdyacentes();
         }
     }
 
-    // Método para agregar un nodo al grafo de GraphStream
-    private void agregarNodoGraphStream(Casilla casilla) {
-        String id = casilla.getId();
-        if (grafoGraphStream.getNode(id) == null) {
-            Node nodo = grafoGraphStream.addNode(id);
-            nodo.setAttribute("ui.label", id);
-        }
-    }
+    public void setCasillas(Casilla[][] casillas) {
+        this.casillas = casillas;
 
-    // Método para agregar una arista al grafo de GraphStream
-    private void agregarAristaGraphStream(Casilla origen, Casilla destino) {
-        String idArista = origen.getId() + "-" + destino.getId();
-        if (grafoGraphStream.getEdge(idArista) == null) {
-            grafoGraphStream.addEdge(idArista, origen.getId(), destino.getId());
+        // Actualizar la interfaz gráfica para reflejar el estado de las casillas
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                Casilla casilla = casillas[i][j];
+
+                // Si la casilla está revelada, mostrarla como tal
+                if (casilla.estaRevelada()) {
+                    if (casilla.esMina()) {
+                        casilla.setText("💣"); // Mostrar una mina
+                    } else if (casilla.getMinasAdyacentes() > 0) {
+                        casilla.setText(String.valueOf(casilla.getMinasAdyacentes())); // Mostrar el número de minas adyacentes
+                    } else {
+                        casilla.setText(""); // Casilla vacía
+                    }
+                    casilla.setEnabled(false); // Deshabilitar la casilla
+                }
+
+                // Si la casilla está marcada con una bandera, mostrarla como tal
+                if (casilla.estaMarcadaConBandera()) {
+                    casilla.setText("🚩"); // Mostrar una bandera
+                }
+            }
         }
+
+        // Forzar la actualización del tablero
+        repaint();
     }
 
     private void crearTablero(JPanel panelTablero) {
@@ -229,59 +240,72 @@ public class Tablero extends JPanel {
     }
 
     private void bfs(Casilla inicio) {
-    Cola cola = new Cola();
-    cola.encolar(inicio);
-    inicio.revelar();
-    agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
+        Cola cola = new Cola();
+        cola.encolar(inicio);
+        inicio.revelar();
+        agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
 
-    while (!cola.estaVacia()) {
-        Casilla actual = cola.desencolar();
-        if (actual.getMinasAdyacentes() == 0) {
-            // Solo revelar casillas adyacentes si la casilla actual está vacía
-            Nodo vecino = actual.getVecinos().getCabeza();
-            while (vecino != null) {
-                Casilla v = vecino.casilla;
-                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
-                    v.revelar();
-                    cola.encolar(v);
-                    agregarNodoGraphStream(v); // Agregar el nodo al grafo
-                    agregarAristaGraphStream(actual, v); // Agregar la arista
+        while (!cola.estaVacia()) {
+            Casilla actual = cola.desencolar();
+            if (actual.getMinasAdyacentes() == 0) {
+                // Solo revelar casillas adyacentes si la casilla actual está vacía
+                Nodo vecino = actual.getVecinos().getCabeza();
+                while (vecino != null) {
+                    Casilla v = vecino.casilla;
+                    if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                        v.revelar();
+                        cola.encolar(v);
+                        agregarNodoGraphStream(v); // Agregar el nodo al grafo
+                        agregarAristaGraphStream(actual, v); // Agregar la arista
+                    }
+                    vecino = vecino.siguiente;
                 }
-                vecino = vecino.siguiente;
             }
         }
     }
-    // nada
-}   
 
     private void dfs(Casilla inicio) {
-    Pila pila = new Pila();
-    pila.apilar(inicio);
-    inicio.revelar();
-    agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
+        Pila pila = new Pila();
+        pila.apilar(inicio);
+        inicio.revelar();
+        agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
 
-    while (!pila.estaVacia()) {
-        Casilla actual = pila.desapilar();
-        if (actual.getMinasAdyacentes() == 0) {
-            // Solo revelar casillas adyacentes si la casilla actual está vacía
-            Nodo vecino = actual.getVecinos().getCabeza();
-            while (vecino != null) {
-                Casilla v = vecino.casilla;
-                if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
-                    v.revelar();
-                    pila.apilar(v);
-                    agregarNodoGraphStream(v); // Agregar el nodo al grafo
-                    agregarAristaGraphStream(actual, v); // Agregar la arista
+        while (!pila.estaVacia()) {
+            Casilla actual = pila.desapilar();
+            if (actual.getMinasAdyacentes() == 0) {
+                // Solo revelar casillas adyacentes si la casilla actual está vacía
+                Nodo vecino = actual.getVecinos().getCabeza();
+                while (vecino != null) {
+                    Casilla v = vecino.casilla;
+                    if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
+                        v.revelar();
+                        pila.apilar(v);
+                        agregarNodoGraphStream(v); // Agregar el nodo al grafo
+                        agregarAristaGraphStream(actual, v); // Agregar la arista
+                    }
+                    vecino = vecino.siguiente;
                 }
-                vecino = vecino.siguiente;
             }
         }
     }
-    // NO Mostrar el grafo al finalizar DFS
-}
 
-    public void setUsarBFS(boolean usarBFS) {
-        this.usarBFS = usarBFS;
+    public void marcarCasillaConBandera(Casilla casilla) {
+        if (!casilla.estaRevelada()) {
+            if (casilla.estaMarcadaConBandera()) {
+                // Si ya estaba marcada, la desmarcamos
+                casilla.marcarConBandera();
+                actualizarBanderasDisponibles(1); // Aumentar banderas disponibles
+            } else if (banderasDisponibles > 0) {
+                // Si no estaba marcada y hay banderas disponibles, la marcamos
+                casilla.marcarConBandera();
+                actualizarBanderasDisponibles(-1); // Reducir banderas disponibles
+            }
+            verificarVictoria(); // Verificar si el jugador ha ganado
+        }
+    }
+
+    public void actualizarBanderasDisponibles(int cambio) {
+        banderasDisponibles += cambio;
     }
 
     public boolean todasLasMinasMarcadas() {
@@ -332,22 +356,31 @@ public class Tablero extends JPanel {
         }
     }
 
-    public void marcarCasillaConBandera(Casilla casilla) {
-        if (!casilla.estaRevelada()) {
-            if (casilla.estaMarcadaConBandera()) {
-                // Si ya estaba marcada, la desmarcamos
-                casilla.marcarConBandera();
-                actualizarBanderasDisponibles(1); // Aumentar banderas disponibles
-            } else if (banderasDisponibles > 0) {
-                // Si no estaba marcada y hay banderas disponibles, la marcamos
-                casilla.marcarConBandera();
-                actualizarBanderasDisponibles(-1); // Reducir banderas disponibles
-            }
-            verificarVictoria(); // Verificar si el jugador ha ganado
+    // Método para mostrar el grafo en una ventana aparte
+    public void mostrarGrafo() {
+        if (viewer == null) {
+            viewer = grafoGraphStream.display(); // Mostrar el grafo por primera vez
+        } else {
+            // Cerrar el visor actual y abrir uno nuevo para actualizar el grafo
+            viewer.getDefaultView().close(viewer.getGraphicGraph());
+            viewer = grafoGraphStream.display();
         }
     }
 
-    public void actualizarBanderasDisponibles(int cambio) {
-        banderasDisponibles += cambio;
+    // Método para agregar un nodo al grafo de GraphStream
+    private void agregarNodoGraphStream(Casilla casilla) {
+        String id = casilla.getId();
+        if (grafoGraphStream.getNode(id) == null) {
+            Node nodo = grafoGraphStream.addNode(id);
+            nodo.setAttribute("ui.label", id);
+        }
+    }
+
+    // Método para agregar una arista al grafo de GraphStream
+    private void agregarAristaGraphStream(Casilla origen, Casilla destino) {
+        String idArista = origen.getId() + "-" + destino.getId();
+        if (grafoGraphStream.getEdge(idArista) == null) {
+            grafoGraphStream.addEdge(idArista, origen.getId(), destino.getId());
+        }
     }
 }
