@@ -1,6 +1,6 @@
 package buscaminas_edd_1;
 
-class Nodo {
+class Nodo{
     Casilla casilla; // Referencia a la casilla
     Nodo siguiente;  // Referencia al siguiente nodo
 

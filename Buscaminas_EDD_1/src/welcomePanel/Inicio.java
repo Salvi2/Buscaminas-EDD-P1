@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package welcomePanel;
+
 import buscaminas_edd_1.Casilla;
+import buscaminas_edd_1.ListaEnlazada;
 import buscaminas_edd_1.Tablero;
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +15,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import winnPanel.WIN;
 
 /**
  *
@@ -31,6 +32,8 @@ public class Inicio extends javax.swing.JFrame {
     public Inicio() {
         initComponents();
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -167,37 +170,30 @@ public class Inicio extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             
 
-            // Verificar si los campos están vacíos
-            if (NumeroFilas.getText().trim().isEmpty() || 
-                NumeroColumnas.getText().trim().isEmpty() || 
-                NumeroMinas.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, ingresa valores en todos los campos.", "Error", JOptionPane.ERROR_MESSAGE);
-                return; // Detener la ejecución si algún campo está vacío
-            }
-              // Obtener los valores ingresados por el usuario
-            int filas = Integer.parseInt(NumeroFilas.getText());
-            int columnas = Integer.parseInt(NumeroColumnas.getText());
-            int minas = Integer.parseInt(NumeroMinas.getText()); 
+             // Obtener los valores ingresados por el usuario
+        int filas = Integer.parseInt(NumeroFilas.getText());
+        int columnas = Integer.parseInt(NumeroColumnas.getText());
+        int minas = Integer.parseInt(NumeroMinas.getText());
 
-            // Validar que los valores sean válidos
-            if ( filas < 3 || filas > 10 || columnas < 3 || columnas > 10 || minas >= filas*columnas) {
-                JOptionPane.showMessageDialog(this, "Valores inválidos. Asegúrate de que las filas, columnas y minas sean válidas.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+        // Validar que los valores sean válidos
+        if (filas < 3 || filas > 10 || columnas < 3 || columnas > 10 || minas >= filas * columnas) {
+            JOptionPane.showMessageDialog(this, "Valores inválidos. Asegúrate de que las filas, columnas y minas sean válidas.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-            // Crear una nueva ventana para el tablero
-            JFrame frame = new JFrame("Buscaminas");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Crear una nueva ventana para el tablero
+        JFrame frame = new JFrame("Buscaminas");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            // Crear el tablero con los valores ingresados
-            Tablero tablero = new Tablero(filas, columnas, minas);
-            frame.add(tablero);
-            // Ajustar el tamaño de la ventana y hacerla visible
-            frame.pack();
-            frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
-            frame.setVisible(true);
-            
-             this.dispose();
+        // Crear el tablero con los valores ingresados
+        Tablero tablero = new Tablero(filas, columnas, minas);
+        frame.add(tablero);
+        // Ajustar el tamaño de la ventana y hacerla visible
+        frame.pack();
+        frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+        frame.setVisible(true);
+
+        this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void NumeroColumnasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroColumnasActionPerformed
@@ -214,101 +210,122 @@ public class Inicio extends javax.swing.JFrame {
 
     private void cargarPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarPartidaActionPerformed
         // TODO add your handling code
-    // Crear un JFileChooser para que el usuario seleccione el archivo CSV
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Cargar partida guardada");
-    int seleccionUsuario = fileChooser.showOpenDialog(this);
+     // TODO add your handling code
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Cargar partida");
 
-    // Verificar si el usuario seleccionó un archivo
-    if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
-        File archivo = fileChooser.getSelectedFile();
+        // Mostrar el diálogo de selección de archivo
+        int seleccionUsuario = fileChooser.showOpenDialog(this);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            List<String[]> datos = new ArrayList<>();
+        // Verificar si el usuario seleccionó un archivo
+        if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
+            File archivo = fileChooser.getSelectedFile();
 
-            // Leer el archivo CSV línea por línea
-            br.readLine(); // Saltar la primera línea (encabezado)
-            while ((linea = br.readLine()) != null) {
-                String[] valores = linea.split(",");
-                if (valores.length == 5) { // Asegurarse de que la línea tenga 5 columnas
-                    datos.add(valores);
-                }
-            }
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                String line;
+                boolean isFirstLine = true; // Bandera para identificar la primera línea (cabecera)
 
-            // Determinar el número de filas y columnas basado en los datos
-            int totalCasillas = datos.size();
-            int columnas = 10; // Asumimos que el tablero tiene 10 columnas
-            int filas = totalCasillas / columnas;
+                ListaEnlazada casillasConMina = new ListaEnlazada();
+                int numMinas = 0;
+                int parsedColumnas = 0;
+                int parsedFilas = 0;
+                // Leer el archivo CSV línea por línea
+                while ((line = br.readLine()) != null) {
+                    if (isFirstLine) {
 
-            // Verificar que el número de casillas sea coherente
-            if (totalCasillas % columnas != 0) {
-                JOptionPane.showMessageDialog(this, "El archivo CSV no tiene un tamaño válido.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+                        // Dividir la línea en valores separados por comas
+                        String[] valores = line.split(",");
 
-            // Crear una matriz de casillas con el tamaño adecuado
-            Casilla[][] casillas = new Casilla[filas][columnas];
+                        parsedColumnas = Integer.parseInt(valores[1].strip());
+                        parsedFilas = Integer.parseInt(valores[3].strip());
 
-            // Contar el número de minas en el archivo
-            int numMinas = 0;
+                        Casilla[][] newCasillas = new Casilla[parsedFilas][parsedColumnas];
+                        this.casillas = newCasillas;
 
-            // Llenar la matriz de casillas con los datos del archivo
-            for (int i = 0; i < filas; i++) {
-                for (int j = 0; j < columnas; j++) {
-                    String[] valores = datos.get(i * columnas + j);
-                    String id = valores[0];
-                    boolean esMina = Boolean.parseBoolean(valores[1]);
-                    boolean revelada = Boolean.parseBoolean(valores[2]);
-                    boolean bandera = Boolean.parseBoolean(valores[3]);
-                    int minasAdyacentes = Integer.parseInt(valores[4]);
+                        isFirstLine = false; // Ignorar la primera línea (cabecera)
+                        continue;
+                    }
 
-                    // Crear la casilla con los datos leídos
-                    Casilla casilla = new Casilla(id);
-                    casilla.setEsMina(esMina);
-                    casilla.setRevelada(revelada);
-                    casilla.setMarcadaConBandera(bandera);
-                    casilla.setMinasAdyacentes(minasAdyacentes);
+                    // Dividir la línea en valores separados por comas
+                    String[] valores = line.split(",");
 
-                    casillas[i][j] = casilla;
+                    // Verificar que la línea tenga el formato correcto
+                    if (valores.length != 5) {
+                        JOptionPane.showMessageDialog(this, "Error: Formato de archivo CSV inválido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
 
-                    // Contar minas
-                    if (esMina) {
-                        numMinas++;
+                    // Obtener los valores de la línea
+                    String id = valores[0]; // ID de la casilla (ej. "A1")
+                    boolean esMina = Boolean.parseBoolean(valores[1]); // Mina
+                    boolean revelada = Boolean.parseBoolean(valores[2]); // Revelada
+                    boolean bandera = Boolean.parseBoolean(valores[3]); // Bandera
+                    int minasAdyacentes = Integer.parseInt(valores[4]); // Minas adyacentes
+
+                    // Convertir el ID de la casilla a coordenadas (fila, columna)
+                    int fila = id.charAt(0) - 'A'; // Convertir la letra a índice (A=0, B=1, etc.)
+                    int columna = Integer.parseInt(id.substring(1)) - 1; // Convertir el número a índice base 0
+
+                    // Verificar que las coordenadas estén dentro de los límites del tablero
+                    if (fila >= 0 && fila < parsedFilas && columna >= 0 && columna < parsedColumnas) {
+                        // Crear o actualizar la casilla con los valores del CSV
+
+                        Casilla casilla = new Casilla(id); //Creamos casilla y la metemos a la matriz
+                        casillas[fila][columna] = casilla;
+                        casilla.setEsMina(esMina);
+                        if (casilla.esMina()) {
+                            //colocar logica para ayadir a la lista de minas
+                            casillasConMina.agregar(casilla);
+                            numMinas++;
+
+                        }
+                        casilla.setRevelada(revelada);
+                        casilla.setMarcadaConBandera(bandera);
+                        casilla.setMinasAdyacentes(minasAdyacentes);
+
+                        // Actualizar la interfaz gráfica de la casilla
+                        if (revelada) {
+                            casilla.revelar(); // Revelar la casilla si está marcada como revelada
+                        }
+                        if (bandera) {
+                            casilla.marcarConBandera(); // Marcar con bandera si está marcada
+                        }
+
                     }
                 }
+
+                // añadi9r tablero
+                // Crear una nueva ventana para el tablero
+                JFrame frame = new JFrame("Buscaminas");
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+                // Crear el tablero con los valores ingresados
+                Tablero tablero = new Tablero(parsedFilas, parsedColumnas, numMinas, casillas, casillasConMina);
+
+                frame.add(tablero);
+                // Ajustar el tamaño de la ventana y hacerla visible
+                frame.pack();
+                frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+                frame.setVisible(true);
+
+                this.dispose();
+
+                // Mostrar mensaje de éxito
+                JOptionPane.showMessageDialog(this, "Partida cargada correctamente desde:\n" + archivo.getAbsolutePath(), "Cargar Partida", JOptionPane.INFORMATION_MESSAGE);
+
+             
+
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Error en el formato del archivo CSV: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
-
-            // Crear una nueva ventana para el tablero
-            JFrame frame = new JFrame("Buscaminas - Partida Cargada");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-            // Crear el tablero sin generar minas ni casillas nuevas
-            Tablero tablero = new Tablero(filas, columnas, numMinas, false);
-            tablero.setCasillas(casillas); // Asignar las casillas cargadas al tablero
-            frame.add(tablero);
-
-            // Ajustar el tamaño de la ventana y hacerla visible
-            frame.pack();
-            frame.setLocationRelativeTo(null); // Centrar la ventana en la pantalla
-            frame.setVisible(true);
-
-            // Cerrar la ventana de inicio
-            this.dispose();
-
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al leer el archivo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Error en el formato del archivo CSV: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Error inesperado: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+        } else {
+            // El usuario canceló la selección del archivo
+            JOptionPane.showMessageDialog(this, "Carga cancelada.", "Cargar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
-    } else {
-        JOptionPane.showMessageDialog(this, "Carga de partida cancelada.", "Información", JOptionPane.INFORMATION_MESSAGE);
-    }
 
     }//GEN-LAST:event_cargarPartidaActionPerformed
 

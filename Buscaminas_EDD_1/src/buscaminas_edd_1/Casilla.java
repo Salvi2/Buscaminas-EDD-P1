@@ -1,5 +1,4 @@
 package buscaminas_edd_1;
-
 import losePanel.Lose;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -16,42 +15,53 @@ public class Casilla extends JButton {
     private boolean marcadaConBandera;
 
     public Casilla(String id) {
-        this.id = id;
-        this.esMina = false;
-        this.minasAdyacentes = 0;
-        this.revelada = false;
-        this.marcadaConBandera = false;
-        this.vecinos = new ListaEnlazada();
-        setText(id);
+    this.id = id;
+    this.esMina = false;
+    this.minasAdyacentes = 0;
+    this.revelada = false;
+    this.marcadaConBandera = false;
+    this.vecinos = new ListaEnlazada();
+    setText(id);
 
-        // Manejar clic izquierdo
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                onClic();
-            }
-        });
+    // Manejar clic izquierdo
+    addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            onClic();
+        }
+    });
 
-        // Manejar clic derecho
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) { // Verificar si es clic derecho
-                    Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, Casilla.this);
-                    if (tablero != null) {
-                        tablero.marcarCasillaConBandera(Casilla.this); // Llamar al método del tablero
-                    }
-                }
+    // Manejar clic derecho
+    addMouseListener(new MouseAdapter() {
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (SwingUtilities.isRightMouseButton(e)) { // Verificar si es clic derecho
+            Tablero tablero = (Tablero) SwingUtilities.getAncestorOfClass(Tablero.class, Casilla.this);
+            if (tablero != null) {
+                tablero.marcarCasillaConBandera(Casilla.this); // Llamar al método del tablero
             }
-        });
+        }
+    }
+    });
+}
+
+    public Casilla(int id, boolean esMina, boolean revelada, boolean bandera, int minasAdyacentes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Casilla() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Casilla(String id, boolean esMina, boolean revelada, boolean bandera, int minasAdyacentes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     public void onClic() {
-        // Si la casilla está marcada con una bandera, no se permite hacer clic izquierdo
-        if (marcadaConBandera) {
-            return; // Salir del método sin hacer nada
-        }
-
+            // Si la casilla está marcada con una bandera, no se permite hacer clic izquierdo
+            if (marcadaConBandera){
+                return; // Salir del método sin hacer nada
+            }
         if (esMina) {
             setText("💣");
             setEnabled(false);
@@ -71,16 +81,22 @@ public class Casilla extends JButton {
             }
         }
     }
-
+    
     public void marcarConBandera() {
-        if (!revelada) { // Solo se puede marcar si no está revelada
-            marcadaConBandera = !marcadaConBandera;
-            setText(marcadaConBandera ? "🚩" : id); // Usamos un emoji de bandera
-        }
+    if (!revelada) { // Solo se puede marcar si no está revelada
+        marcadaConBandera = !marcadaConBandera;
+        setText(marcadaConBandera ? "🚩" : id); // Usamos un emoji de bandera
+    }
+    }
+    
+    public boolean estaMarcadaConBandera() {
+    return marcadaConBandera;
     }
 
-    public boolean estaMarcadaConBandera() {
-        return marcadaConBandera;
+    private void reiniciarJuego() {
+        JFrame ventana = (JFrame) SwingUtilities.getWindowAncestor(this);
+        ventana.dispose();
+        new Buscaminas();
     }
 
     public void agregarVecino(Casilla vecino) {
@@ -125,37 +141,11 @@ public class Casilla extends JButton {
         this.minasAdyacentes = minasAdyacentes;
     }
 
-    /**
-     * Establece si la casilla está revelada o no.
-     *
-     * @param revelada true si la casilla está revelada, false en caso contrario.
-     */
     public void setRevelada(boolean revelada) {
-        this.revelada = revelada;
-        if (revelada) {
-            // Si la casilla está revelada, actualizamos su apariencia
-            if (esMina) {
-                setText("💣"); // Mostrar una mina
-            } else if (minasAdyacentes > 0) {
-                setText(String.valueOf(minasAdyacentes)); // Mostrar el número de minas adyacentes
-            } else {
-                setText(""); // Casilla vacía
-            }
-            setEnabled(false); // Deshabilitar la casilla para que no se pueda hacer clic
-        }
+       this.revelada = revelada;
     }
 
-    /**
-     * Establece si la casilla está marcada con una bandera o no.
-     *
-     * @param bandera true si la casilla está marcada con una bandera, false en caso contrario.
-     */
     public void setMarcadaConBandera(boolean bandera) {
         this.marcadaConBandera = bandera;
-        if (bandera) {
-            setText("🚩"); // Mostrar una bandera
-        } else {
-            setText(""); // Quitar la bandera
-        }
     }
 }
