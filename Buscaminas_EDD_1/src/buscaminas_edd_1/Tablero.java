@@ -496,20 +496,4 @@ public class Tablero extends JPanel {
     public void actualizarBanderasDisponibles(int cambio) {
         banderasDisponibles += cambio;
     }
-
-    public void setMina(int fila, int columna, boolean mina) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setRevelada(int fila, int columna, boolean revelada) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setBandera(int fila, int columna, boolean bandera) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    public void setMinasAdyacentes(int fila, int columna, int minasAdyacentes) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
