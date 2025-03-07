@@ -17,5 +17,5 @@ public class Buscaminas {
         Inicio inicio = new Inicio();
         inicio.setVisible(true);
         inicio.setLocationRelativeTo(null);
-    }
+    } 
 }
