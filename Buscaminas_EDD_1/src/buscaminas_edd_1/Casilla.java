@@ -7,7 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Clase que representa una casilla en el tablero del Buscaminas.
+ * Clase que representa una celda individual en el tablero .
  * Cada casilla puede contener una mina, estar revelada, marcada con una bandera, y tener un número de minas adyacentes.
  */
 public class Casilla extends JButton {

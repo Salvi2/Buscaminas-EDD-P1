@@ -11,7 +11,7 @@ import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
 
 /**
- * Clase que representa el tablero del juego Buscaminas.
+ * Esta Clase presenta el tablero del juego.
  * Contiene las casillas, minas, y métodos para manejar la lógica del juego.
  */
 public class Tablero extends JPanel {

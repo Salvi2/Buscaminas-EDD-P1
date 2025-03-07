@@ -1,8 +1,10 @@
 package buscaminas_edd_1;
 
 /**
- * Clase que representa una cola de casillas.
- * Utilizada para implementar el algoritmo BFS en el tablero del Buscaminas.
+ *Implementa una estructura de datos de tipo cola (FIFO) 
+ *La utilizamos para gestionar casillas durante la ejecución del algoritmo BFS (Búsqueda en Amplitud).
+ *
+ * 
  */
 public class Cola {
     private Nodo frente;

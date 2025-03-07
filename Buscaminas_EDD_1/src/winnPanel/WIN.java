@@ -7,13 +7,14 @@ package winnPanel;
 import buscaminas_edd_1.Buscaminas;
 
 /**
- *
- * @author jesus
+ * Ventana que se muestra cuando el jugador gana.
+ * Es la interfaz gráfica de la ventana de victoria.
  */
 public class WIN extends javax.swing.JFrame {
 
     /**
-     * Creates new form WIN
+     * Constructor de la ventana de victoria.
+     * Inicializa los componentes de la interfaz gráfica.
      */
     public WIN() {
         initComponents();
@@ -65,7 +66,12 @@ public class WIN extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+     * Maneja el evento de clic en el botón "REINICIAR".
+     * Cierra la ventana actual y reinicia el juego llamando a la clase Buscaminas.
+     *
+     * @param evt Evento de acción generado por el botón.
+     */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             // Cerrar la ventana actual
         this.dispose();

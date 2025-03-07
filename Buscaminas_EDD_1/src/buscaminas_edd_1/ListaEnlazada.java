@@ -1,8 +1,7 @@
 package buscaminas_edd_1;
 
 /**
- * Clase que representa una lista enlazada de casillas.
- * Utilizada para almacenar vecinos de una casilla y minas colocadas en el tablero.
+ *Esta clase se utiliza para almacenar y gestionar casillas, como las minas colocadas en el tablero o los vecinos de una casilla.
  */
 public class ListaEnlazada {
     private Nodo cabeza;

@@ -1,8 +1,8 @@
 package buscaminas_edd_1;
 
 /**
- * Clase que representa una pila de casillas.
- * Utilizada para implementar el algoritmo DFS en el tablero del Buscaminas.
+ * Implementa una estructura de datos de tipo pila (LIFO) 
+ * Utilizada para gestionar casillas durante la ejecución del algoritmo DFS (Búsqueda en Profundidad)
  */
 public class Pila {
     private Nodo tope;

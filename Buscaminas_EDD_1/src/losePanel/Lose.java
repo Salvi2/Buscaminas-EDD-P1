@@ -6,15 +6,15 @@ package losePanel;
 
 import buscaminas_edd_1.Buscaminas;
 
-
 /**
- *
- * @author jesus
+ * Ventana que se muestra cuando el jugador pierde el juego Buscaminas.
+ * Esta clase representa la interfaz gráfica de la pantalla de derrota.
  */
 public class Lose extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Lose
+     /**
+     * Constructor de la ventana de derrota.
+     * Inicializa los componentes de la interfaz gráfica.
      */
     public Lose() {
         initComponents();
@@ -78,7 +78,12 @@ public class Lose extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+     * Maneja el evento de clic en el botón "REINICIAR".
+     * Cierra la ventana actual y reinicia el juego llamando a la clase Buscaminas.
+     *
+     * @param evt Evento de acción generado por el botón.
+     */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
     // Cerrar la ventana actual

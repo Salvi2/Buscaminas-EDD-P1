@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author jesus
+ * Ventana de inicio del juego Buscaminas.
+ * Permite al usuario configurar los parámetros del tablero o cargar una partida guardada.
  */
 public class Inicio extends javax.swing.JFrame {
 
@@ -26,15 +26,13 @@ public class Inicio extends javax.swing.JFrame {
     private int columnas;
     private int filas;
 
-    /**
-     * Creates new form Inicio
+     /**
+     * Constructor de la ventana de inicio.
+     * Inicializa los componentes de la interfaz gráfica.
      */
     public Inicio() {
         initComponents();
     }
-    
-    
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -166,7 +164,12 @@ public class Inicio extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+     * Maneja el evento de clic en el botón "INICIO".
+     * Crea un nuevo tablero con las dimensiones y minas especificadas por el usuario.
+     *
+     * @param evt Evento de acción generado por el botón.
+     */
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
             
 
@@ -207,7 +210,13 @@ public class Inicio extends javax.swing.JFrame {
     private void NumeroFilasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NumeroFilasActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_NumeroFilasActionPerformed
-
+    
+    /**
+     * Maneja el evento de clic en el botón "CARGAR PARTIDA".
+     * Permite al usuario cargar una partida guardada desde un archivo CSV.
+     *
+     * @param evt Evento de acción generado por el botón.
+     */
     private void cargarPartidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cargarPartidaActionPerformed
         // TODO add your handling code
      // TODO add your handling code
@@ -330,7 +339,9 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_cargarPartidaActionPerformed
 
     /**
-     * @param args the command line arguments
+     * Método principal para ejecutar la ventana de inicio.
+     *
+     * @param args Argumentos de la línea de comandos (no se utilizan).
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
