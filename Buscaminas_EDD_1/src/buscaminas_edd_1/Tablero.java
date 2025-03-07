@@ -10,6 +10,10 @@ import org.graphstream.graph.*;
 import org.graphstream.graph.implementations.*;
 import org.graphstream.ui.view.Viewer;
 
+/**
+ * Clase que representa el tablero del juego Buscaminas.
+ * Contiene las casillas, minas, y métodos para manejar la lógica del juego.
+ */
 public class Tablero extends JPanel {
 
     private int filas;
@@ -31,7 +35,14 @@ public class Tablero extends JPanel {
     private JButton botonMostrarGrafo;
 
     private final JPanel panel = new JPanel();
-    
+
+    /**
+     * Constructor del tablero.
+     *
+     * @param filas Número de filas del tablero.
+     * @param columnas Número de columnas del tablero.
+     * @param numMinas Número de minas en el tablero.
+     */
     public Tablero(int filas, int columnas, int numMinas) {
         this.filas = filas;
         this.columnas = columnas;
@@ -40,23 +51,19 @@ public class Tablero extends JPanel {
         this.casillas = new Casilla[filas][columnas];
         this.minasColocadas = new ListaEnlazada();
 
-        // Configurar el layout principal
         setLayout(new BorderLayout());
 
-        // Inicializar GraphStream
-        System.setProperty("org.graphstream.ui", "swing"); // Usar Swing para la interfaz
+        System.setProperty("org.graphstream.ui", "swing");
         grafoGraphStream = new SingleGraph("Buscaminas");
         grafoGraphStream.setAttribute("ui.stylesheet", "node { fill-color: blue; size: 20px; text-size: 15px; }");
 
-        // Panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new FlowLayout());
 
         botonMostrarGrafo = new JButton("Mostrar Gráfico");
         botonMostrarGrafo.addActionListener(e -> mostrarGrafo());
-        panelBotones.add(botonMostrarGrafo); // Agregar el botón al panel de botones
+        panelBotones.add(botonMostrarGrafo);
 
-        // Botón para activar BFS
         botonBFS = new JButton("Usar BFS");
         botonBFS.addActionListener(e -> {
             usarBFS = true;
@@ -64,7 +71,6 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonBFS);
 
-        // Botón para activar DFS
         botonDFS = new JButton("Usar DFS");
         botonDFS.addActionListener(e -> {
             usarBFS = false;
@@ -72,15 +78,12 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonDFS);
 
-        // Botón para guardar partida
         botonGuardar = new JButton("Guardar Partida");
         botonGuardar.addActionListener(e -> guardarPartida());
         panelBotones.add(botonGuardar);
 
-        // Agregar el panel de botones en la parte superior
         add(panelBotones, BorderLayout.NORTH);
 
-        // Panel para el tablero
         this.panel.setLayout(new GridLayout(filas, columnas));
         crearTablero(this.panel);
         add(this.panel, BorderLayout.CENTER);
@@ -90,30 +93,30 @@ public class Tablero extends JPanel {
         contarMinasAdyacentes();
     }
 
+    /**
+     * Constructor alternativo del tablero.
+     *
+     * @param casilla Casilla inicial.
+     * @param numMinas Número de minas en el tablero.
+     */
     public Tablero(Casilla casilla, int numMinas) {
-
         this.numMinas = numMinas;
         this.banderasDisponibles = numMinas;
-
         this.minasColocadas = new ListaEnlazada();
 
-        // Configurar el layout principal
         setLayout(new BorderLayout());
 
-        // Inicializar GraphStream
-        System.setProperty("org.graphstream.ui", "swing"); // Usar Swing para la interfaz
+        System.setProperty("org.graphstream.ui", "swing");
         grafoGraphStream = new SingleGraph("Buscaminas");
         grafoGraphStream.setAttribute("ui.stylesheet", "node { fill-color: blue; size: 20px; text-size: 15px; }");
 
-        // Panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new FlowLayout());
 
         botonMostrarGrafo = new JButton("Mostrar Gráfico");
         botonMostrarGrafo.addActionListener(e -> mostrarGrafo());
-        panelBotones.add(botonMostrarGrafo); // Agregar el botón al panel de botones
+        panelBotones.add(botonMostrarGrafo);
 
-        // Botón para activar BFS
         botonBFS = new JButton("Usar BFS");
         botonBFS.addActionListener(e -> {
             usarBFS = true;
@@ -121,7 +124,6 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonBFS);
 
-        // Botón para activar DFS
         botonDFS = new JButton("Usar DFS");
         botonDFS.addActionListener(e -> {
             usarBFS = false;
@@ -129,15 +131,12 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonDFS);
 
-        // Botón para guardar partida
         botonGuardar = new JButton("Guardar Partida");
         botonGuardar.addActionListener(e -> guardarPartida());
         panelBotones.add(botonGuardar);
 
-        // Agregar el panel de botones en la parte superior
         add(panelBotones, BorderLayout.NORTH);
 
-        // Panel para el tablero
         JPanel panelTablero = new JPanel();
         panelTablero.setLayout(new GridLayout(filas, columnas));
         crearTablero(panelTablero);
@@ -148,6 +147,15 @@ public class Tablero extends JPanel {
         contarMinasAdyacentes();
     }
 
+    /**
+     * Constructor del tablero con parámetros específicos.
+     *
+     * @param filas Número de filas del tablero.
+     * @param columnas Número de columnas del tablero.
+     * @param numMinas Número de minas en el tablero.
+     * @param casillas Matriz de casillas.
+     * @param minasColocadas Lista de minas colocadas.
+     */
     public Tablero(int filas, int columnas, int numMinas, Casilla[][] casillas, ListaEnlazada minasColocadas) {
         this.filas = filas;
         this.columnas = columnas;
@@ -155,23 +163,19 @@ public class Tablero extends JPanel {
         this.casillas = casillas;
         this.minasColocadas = minasColocadas;
 
-        // Configurar el layout principal
         setLayout(new BorderLayout());
 
-        // Inicializar GraphStream
-        System.setProperty("org.graphstream.ui", "swing"); // Usar Swing para la interfaz
+        System.setProperty("org.graphstream.ui", "swing");
         grafoGraphStream = new SingleGraph("Buscaminas");
         grafoGraphStream.setAttribute("ui.stylesheet", "node { fill-color: blue; size: 20px; text-size: 15px; }");
 
-        // Panel para los botones
         JPanel panelBotones = new JPanel();
         panelBotones.setLayout(new FlowLayout());
 
         botonMostrarGrafo = new JButton("Mostrar Gráfico");
         botonMostrarGrafo.addActionListener(e -> mostrarGrafo());
-        panelBotones.add(botonMostrarGrafo); // Agregar el botón al panel de botones
+        panelBotones.add(botonMostrarGrafo);
 
-        // Botón para activar BFS
         botonBFS = new JButton("Usar BFS");
         botonBFS.addActionListener(e -> {
             usarBFS = true;
@@ -179,7 +183,6 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonBFS);
 
-        // Botón para activar DFS
         botonDFS = new JButton("Usar DFS");
         botonDFS.addActionListener(e -> {
             usarBFS = false;
@@ -187,26 +190,20 @@ public class Tablero extends JPanel {
         });
         panelBotones.add(botonDFS);
 
-        // Botón para guardar partida
         botonGuardar = new JButton("Guardar Partida");
         botonGuardar.addActionListener(e -> guardarPartida());
         panelBotones.add(botonGuardar);
 
-        // Agregar el panel de botones en la parte superior
         add(panelBotones, BorderLayout.NORTH);
 
-        // Verificar la inicialización de filas y columnas
         if (filas <= 0 || columnas <= 0) {
             throw new IllegalArgumentException("Las variables 'filas' y 'columnas' deben ser mayores a 0");
         }
 
-        // Panel para el tablero
         this.panel.setLayout(new GridLayout(filas, columnas));
-        //Cambiar esto por el otro metodo create table from existing
         this.crearTableroFromExistingTablero(this.panel);
         add(this.panel, BorderLayout.CENTER);
 
-        // Verificar que el panelTablero no sea null después de crear el tablero
         if (this.panel == null) {
             throw new IllegalStateException("El panel de tablero no puede ser null");
         }
@@ -216,19 +213,24 @@ public class Tablero extends JPanel {
         construirGrafo();
         contarMinasAdyacentes();
     }
- 
-    // Método para mostrar el grafo en una ventana aparte
+
+    /**
+     * Muestra el grafo en una ventana aparte.
+     */
     public void mostrarGrafo() {
         if (viewer == null) {
-            viewer = grafoGraphStream.display(); // Mostrar el grafo por primera vez
+            viewer = grafoGraphStream.display();
         } else {
-            // Cerrar el visor actual y abrir uno nuevo para actualizar el grafo
             viewer.getDefaultView().close(viewer.getGraphicGraph());
             viewer = grafoGraphStream.display();
         }
     }
 
-    // Método para agregar un nodo al grafo de GraphStream
+    /**
+     * Agrega un nodo al grafo de GraphStream.
+     *
+     * @param casilla Casilla que representa el nodo.
+     */
     private void agregarNodoGraphStream(Casilla casilla) {
         String id = casilla.getId();
         if (grafoGraphStream.getNode(id) == null) {
@@ -237,7 +239,12 @@ public class Tablero extends JPanel {
         }
     }
 
-    // Método para agregar una arista al grafo de GraphStream
+    /**
+     * Agrega una arista al grafo de GraphStream.
+     *
+     * @param origen Casilla de origen.
+     * @param destino Casilla de destino.
+     */
     private void agregarAristaGraphStream(Casilla origen, Casilla destino) {
         String idArista = origen.getId() + "-" + destino.getId();
         if (grafoGraphStream.getEdge(idArista) == null) {
@@ -245,6 +252,11 @@ public class Tablero extends JPanel {
         }
     }
 
+    /**
+     * Crea el tablero con casillas.
+     *
+     * @param panelTablero Panel donde se agregarán las casillas.
+     */
     private void crearTablero(JPanel panelTablero) {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -255,16 +267,22 @@ public class Tablero extends JPanel {
         }
     }
 
+    /**
+     * Crea el tablero a partir de una matriz de casillas existente.
+     *
+     * @param panelTablero Panel donde se agregarán las casillas.
+     */
     private void crearTableroFromExistingTablero(JPanel panelTablero) {
-
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 panelTablero.add(casillas[i][j]);
             }
         }
-
     }
 
+    /**
+     * Construye el grafo de casillas adyacentes.
+     */
     private void construirGrafo() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -280,6 +298,9 @@ public class Tablero extends JPanel {
         }
     }
 
+    /**
+     * Coloca las minas en el tablero de forma aleatoria.
+     */
     private void colocarMinas() {
         int minasColocadas = 0;
         while (minasColocadas < numMinas) {
@@ -294,6 +315,9 @@ public class Tablero extends JPanel {
         }
     }
 
+    /**
+     * Cuenta el número de minas adyacentes para cada casilla.
+     */
     private void contarMinasAdyacentes() {
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
@@ -313,37 +337,30 @@ public class Tablero extends JPanel {
         }
     }
 
-    //ESTAS TRABAJANDO ACA cOYOOOOOO
+    /**
+     * Guarda la partida actual en un archivo CSV.
+     */
     private void guardarPartida() {
-        // Crear un JFileChooser para que el usuario elija la ubicación y el nombre del archivo
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Guardar partida"); // Título del diálogo
-        fileChooser.setSelectedFile(new File("partida_guardada.csv")); // Nombre por defecto del archivo
+        fileChooser.setDialogTitle("Guardar partida");
+        fileChooser.setSelectedFile(new File("partida_guardada.csv"));
 
-        // Mostrar el diálogo de guardado
         int seleccionUsuario = fileChooser.showSaveDialog(this);
 
-        // Verificar si el usuario hizo clic en "Guardar"
         if (seleccionUsuario == JFileChooser.APPROVE_OPTION) {
-            // Obtener el archivo seleccionado por el usuario
             File archivo = fileChooser.getSelectedFile();
 
-            // Asegurarse de que el archivo tenga la extensión .csv
             if (!archivo.getName().toLowerCase().endsWith(".csv")) {
                 archivo = new File(archivo.getAbsolutePath() + ".csv");
             }
 
-            // Guardar el archivo en la ubicación seleccionada
             try (FileWriter writer = new FileWriter(archivo)) {
-                // Escribir el encabezado del CSV
-                writer.write("col,"+ columnas +",lane,"+filas+",0\n");
+                writer.write("col," + columnas + ",lane," + filas + ",0\n");
 
-                // Guardar el estado de cada casilla en formato CSV
                 for (int i = 0; i < filas; i++) {
                     for (int j = 0; j < columnas; j++) {
                         Casilla casilla = casillas[i][j];
                         writer.write(
-                                
                                 casilla.getId() + ","
                                 + casilla.esMina() + ","
                                 + casilla.estaRevelada() + ","
@@ -359,114 +376,133 @@ public class Tablero extends JPanel {
                 e.printStackTrace();
             }
         } else {
-            // El usuario canceló el diálogo de guardado
             JOptionPane.showMessageDialog(this, "Guardado cancelado.", "Guardar Partida", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
+    /**
+     * Revela las casillas desde una casilla inicial utilizando BFS o DFS.
+     *
+     * @param inicio Casilla inicial desde donde comenzar la revelación.
+     */
     public void revelarDesde(Casilla inicio) {
         if (usarBFS) {
             bfs(inicio);
         } else {
             dfs(inicio);
         }
-        repaint(); // Forzar la actualización del tablero
-        verificarVictoria(); // Verificar si el jugador ha ganado
+        repaint();
+        verificarVictoria();
     }
 
+    /**
+     * Realiza la búsqueda en anchura (BFS) desde una casilla inicial.
+     *
+     * @param inicio Casilla inicial.
+     */
     private void bfs(Casilla inicio) {
         Cola cola = new Cola();
         cola.encolar(inicio);
         inicio.revelar();
-        agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
+        agregarNodoGraphStream(inicio);
 
         while (!cola.estaVacia()) {
             Casilla actual = cola.desencolar();
             if (actual.getMinasAdyacentes() == 0) {
-                // Solo revelar casillas adyacentes si la casilla actual está vacía
                 Nodo vecino = actual.getVecinos().getCabeza();
                 while (vecino != null) {
                     Casilla v = vecino.casilla;
                     if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
                         v.revelar();
                         cola.encolar(v);
-                        agregarNodoGraphStream(v); // Agregar el nodo al grafo
-                        agregarAristaGraphStream(actual, v); // Agregar la arista
+                        agregarNodoGraphStream(v);
+                        agregarAristaGraphStream(actual, v);
                     }
                     vecino = vecino.siguiente;
                 }
             }
         }
-        // nada
     }
 
+    /**
+     * Realiza la búsqueda en profundidad (DFS) desde una casilla inicial.
+     *
+     * @param inicio Casilla inicial.
+     */
     private void dfs(Casilla inicio) {
         Pila pila = new Pila();
         pila.apilar(inicio);
         inicio.revelar();
-        agregarNodoGraphStream(inicio); // Agregar el nodo inicial al grafo
+        agregarNodoGraphStream(inicio);
 
         while (!pila.estaVacia()) {
             Casilla actual = pila.desapilar();
             if (actual.getMinasAdyacentes() == 0) {
-                // Solo revelar casillas adyacentes si la casilla actual está vacía
                 Nodo vecino = actual.getVecinos().getCabeza();
                 while (vecino != null) {
                     Casilla v = vecino.casilla;
                     if (!v.estaRevelada() && !v.esMina() && !v.estaMarcadaConBandera()) {
                         v.revelar();
                         pila.apilar(v);
-                        agregarNodoGraphStream(v); // Agregar el nodo al grafo
-                        agregarAristaGraphStream(actual, v); // Agregar la arista
+                        agregarNodoGraphStream(v);
+                        agregarAristaGraphStream(actual, v);
                     }
                     vecino = vecino.siguiente;
                 }
             }
         }
-        // NO Mostrar el grafo al finalizar DFS
     }
 
+    /**
+     * Establece si se debe usar BFS o DFS.
+     *
+     * @param usarBFS true para usar BFS, false para usar DFS.
+     */
     public void setUsarBFS(boolean usarBFS) {
         this.usarBFS = usarBFS;
     }
 
+    /**
+     * Verifica si todas las minas están marcadas con banderas.
+     *
+     * @return true si todas las minas están marcadas, false en caso contrario.
+     */
     public boolean todasLasMinasMarcadas() {
         Nodo actual = minasColocadas.getCabeza();
         while (actual != null) {
             if (!actual.casilla.estaMarcadaConBandera()) {
-                return false; // Si alguna mina no está marcada, retornar false
+                return false;
             }
             actual = actual.siguiente;
         }
-        return true; // Todas las minas están marcadas
+        return true;
     }
 
+    /**
+     * Verifica si el jugador ha ganado el juego.
+     */
     public void verificarVictoria() {
-        // Verificar si todas las casillas no minas están reveladas
         boolean todasReveladas = true;
         for (int i = 0; i < filas; i++) {
             for (int j = 0; j < columnas; j++) {
                 Casilla casilla = casillas[i][j];
                 if (!casilla.esMina() && !casilla.estaRevelada()) {
                     todasReveladas = false;
-                    break; // Salir del bucle si encontramos una casilla no revelada
+                    break;
                 }
             }
             if (!todasReveladas) {
-                break; // Salir del bucle exterior si ya sabemos que no todas están reveladas
+                break;
             }
         }
 
-        // Verificar si todas las minas están marcadas con banderas
         boolean todasMinasMarcadas = todasLasMinasMarcadas();
 
-        // Si se cumplen ambas condiciones, abrir la ventana de victoria
         if (todasReveladas && todasMinasMarcadas) {
             WIN winPanel = new WIN();
             winPanel.setVisible(true);
             winPanel.setLocationRelativeTo(null);
 
-            // Deshabilitar todas las casillas
             for (int i = 0; i < filas; i++) {
                 for (int j = 0; j < columnas; j++) {
                     casillas[i][j].setEnabled(false);
@@ -478,21 +514,29 @@ public class Tablero extends JPanel {
         }
     }
 
+    /**
+     * Marca o desmarca una casilla con una bandera.
+     *
+     * @param casilla Casilla a marcar o desmarcar.
+     */
     public void marcarCasillaConBandera(Casilla casilla) {
         if (!casilla.estaRevelada()) {
             if (casilla.estaMarcadaConBandera()) {
-                // Si ya estaba marcada, la desmarcamos
                 casilla.marcarConBandera();
-                actualizarBanderasDisponibles(1); // Aumentar banderas disponibles
+                actualizarBanderasDisponibles(1);
             } else if (banderasDisponibles > 0) {
-                // Si no estaba marcada y hay banderas disponibles, la marcamos
                 casilla.marcarConBandera();
-                actualizarBanderasDisponibles(-1); // Reducir banderas disponibles
+                actualizarBanderasDisponibles(-1);
             }
-            verificarVictoria(); // Verificar si el jugador ha ganado
+            verificarVictoria();
         }
     }
 
+    /**
+     * Actualiza el número de banderas disponibles.
+     *
+     * @param cambio Cambio en el número de banderas disponibles.
+     */
     public void actualizarBanderasDisponibles(int cambio) {
         banderasDisponibles += cambio;
     }
