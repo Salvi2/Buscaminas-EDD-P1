@@ -1,2 +1,1 @@
-# Buscaminas-EDD-P1
-token: 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
+El README original está en el archivo ZIP del proyecto, gracias.
