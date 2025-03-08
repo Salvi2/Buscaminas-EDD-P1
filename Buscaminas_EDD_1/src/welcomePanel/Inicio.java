@@ -18,8 +18,9 @@ import java.util.List;
 
 /**
  * Ventana de inicio del juego Buscaminas.
- * Permite al usuario configurar los parámetros del tablero o cargar una partida guardada.
+ *  Permite al usuario configurar los parámetros del tablero o cargar una partida guardada.
  */
+
 public class Inicio extends javax.swing.JFrame {
 
     private Casilla[][] casillas;
