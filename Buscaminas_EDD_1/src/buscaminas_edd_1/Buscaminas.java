@@ -2,7 +2,7 @@ package buscaminas_edd_1;
 import welcomePanel.Inicio;
 
 /**
- * Clase principal que inicia el juego Buscaminas.
+ * Clase principal que inicia el juego Buscaminas. 
  * Esta clase contiene el método main que inicia la interfaz de usuario del juego.
  */
 public class Buscaminas {
